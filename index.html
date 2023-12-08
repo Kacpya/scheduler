@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <script>
+      
+    </script>
+  </head>
+</html>
+
+
+<!DOCTYPE html>
+<html>
+
+<head>
+  <script>
+    function handleCreateEvent(){
+      var eventName = document.getElementById("eventName").value;
+      var eventDay = document.getElementById("dayOfWeek").value;
+      var eventTime = document.getElementById("eventTime").value;
+    
+      var time = eventTime.split(":"); //split day into hours and minutes
+      var hour = time[0];
+      var mins = time[1];
+
+      console.log("Event Name: " + eventName);
+      console.log("Event Day: " + eventDay);
+      console.log("Event Hour: " + hour);
+      console.log("Event Minute: " + mins);
+
+      if (eventName != null && hour > 6 && hour < 19){
+        document.getElementById(eventDay+hour).innerHTML = eventName;
+      }
+      document
+    }
+  </script>
+
+
+  <style>
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    th,
+    td {
+      border: 1px solid black;
+      padding: 8px;
+      text-align: center;
+    }
+
+    th {
+      background-color: #e0e0e0;
+    }
+
+    button {
+      display: inline-block;
+      padding: 12px 24px;
+      background-color: #3498db;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+      transition: background-color 0.3s;
+    }
+
+    .buttonContainer {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px;
+    }
+
+    .popup {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      text-align: center;
+      z-index: 1;
+    }
+
+    .popup-content {
+      position: relative;
+      top: 50%;
+      transform: translateY(-50%);
+      background: #fff;
+      padding: 20px;
+      width: 300px;
+      margin: 0 auto;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    }
+
+  </style>
+</head>
+
+<body>
+  <table onload="generatetable(1)">
+    <tr>
+        <th></th>
+        <th onclick = "generatetable(5)">Mon</th>
+        <th>Tue</th>
+        <th>Wed</th>
+        <th>Thu</th>
+        <th>Fri</th>
+        <th>Sat</th>
+        <th>Sun</th>
+    </tr>
+    <tr>
+      <th class = "hour" >07:00</th>
+      <td id="mon7" onclick = "createEvent(id)"></td>
+      <td id="tue7" onclick = "createEvent(id)"></td>
+      <td id="wed7" onclick = "createEvent(id)"></td>
+      <td id="thu7" onclick = "createEvent(id)"></td>
+      <td id="fri7" onclick = "createEvent(id)"></td>
+      <td id="sat7" onclick = "createEvent(id)"></td>
+      <td id="sun7" onclick = "createEvent(id)"></td>
+  </tr>
+  <tr>
+      <th>08:00</th>
+      <td id="mon8" onclick = "createEvent(id)"></td>
+      <td id="tue8" onclick = "createEvent(id)"></td>
+      <td id="wed8" onclick = "createEvent(id)"></td>
+      <td id="thu8" onclick = "createEvent(id)"></td>
+      <td id="fri8" onclick = "createEvent(id)"></td>
+      <td id="sat8" onclick = "createEvent(id)"></td>
+      <td id="sun8" onclick = "createEvent(id)"></td>
+  </tr>
+  <tr>
+      <th class = "hour" >09:00</th>
+      <td id="mon9" onclick = "createEvent(id)"></td>
+      <td id="tue9" onclick = "createEvent(id)"></td>
+      <td id="wed9" onclick = "createEvent(id)"></td>
+      <td id="thu9" onclick = "createEvent(id)"></td>
+      <td id="fri9" onclick = "createEvent(id)"></td>
+      <td id="sat9" onclick = "createEvent(id)"></td>
+      <td id="sun9" onclick = "createEvent(id)"></td>
+  </tr>
+  <tr>
+      <th class = "hour">10:00</th>
+      <td id="mon10" onclick = "createEvent(id)"></td>
+      <td id="tue10" onclick = "createEvent(id)"></td>
+      <td id="wed10" onclick = "createEvent(id)"></td>
+      <td id="thu10" onclick = "createEvent(id)"></td>
+      <td id="fri10" onclick = "createEvent(id)"></td>
+      <td id="sat10" onclick = "createEvent(id)"></td>
+      <td id="sun10" onclick = "createEvent(id)"></td>
+  </tr>
+  <tr>
+      <th class = "hour" >11:00</th>
+      <td id="mon11" onclick = "createEvent(id)"></td>
+      <td id="tue11" onclick = "createEvent(id)"></td>
+      <td id="wed11" onclick = "createEvent(id)"></td>
+      <td id="thu11" onclick = "createEvent(id)"></td>
+      <td id="fri11" onclick = "createEvent(id)"></td>
+      <td id="sat11" onclick = "createEvent(id)"></td>
+      <td id="sun11" onclick = "createEvent(id)"></td>
+  </tr>
+  <tr>
+      <th class = "hour">12:00</th>
+      <td id="mon12" onclick = "createEvent(id)"></td>
+      <td id="tue12" onclick = "createEvent(id)"></td>
+      <td id="wed12" onclick = "createEvent(id)"></td>
+      <td id="thu12" onclick = "createEvent(id)"></td>
+      <td id="fri12" onclick = "createEvent(id)"></td>
+      <td id="sat12" onclick = "createEvent(id)"></td>
+      <td id="sun12" onclick = "createEvent(id)"></td>
+  </tr>
+  <tr>
+      <th class = "hour" >13:00</th>
+      <td id="mon13" onclick = "createEvent(id)"></td>
+      <td id="tue13" onclick = "createEvent(id)"></td>
+      <td id="wed13" onclick = "createEvent(id)"></td>
+      <td id="thu13" onclick = "createEvent(id)"></td>
+      <td id="fri13" onclick = "createEvent(id)"></td>
+      <td id="sat13" onclick = "createEvent(id)"></td>
+      <td id="sun13" onclick = "createEvent(id)"></td>
+  </tr>
+  <tr>
+      <th class = "hour">14:00</th>
+      <td id="mon14" onclick = "createEvent(id)"></td>
+      <td id="tue14" onclick = "createEvent(id)"></td>
+      <td id="wed14" onclick = "createEvent(id)"></td>
+      <td id="thu14" onclick = "createEvent(id)"></td>
+      <td id="fri14" onclick = "createEvent(id)"></td>
+      <td id="sat14" onclick = "createEvent(id)"></td>
+      <td id="sun14" onclick = "createEvent(id)"></td>
+  </tr>
+  <tr>
+      <th class = "hour">15:00</th>
+      <td id="mon15" onclick = "createEvent(id)"></td>
+      <td id="tue15" onclick = "createEvent(id)"></td>
+      <td id="wed15" onclick = "createEvent(id)"></td>
+      <td id="thu15" onclick = "createEvent(id)"></td>
+      <td id="fri15" onclick = "createEvent(id)"></td>
+      <td id="sat15" onclick = "createEvent(id)"></td>
+      <td id="sun15" onclick = "createEvent(id)"></td>
+  </tr>
+  <tr>
+      <th class = "hour" >16:00</th>
+      <td id="mon16" onclick = "createEvent(id)"></td>
+      <td id="tue16" onclick = "createEvent(id)"></td>
+      <td id="wed16" onclick = "createEvent(id)"></td>
+      <td id="thu16" onclick = "createEvent(id)"></td>
+      <td id="fri16" onclick = "createEvent(id)"></td>
+      <td id="sat16" onclick = "createEvent(id)"></td>
+      <td id="sun16" onclick = "createEvent(id)"></td>
+  </tr>
+  <tr>
+      <th class = "hour" >17:00</th>
+      <td id="mon17" onclick = "createEvent(id)"></td>
+      <td id="tue17" onclick = "createEvent(id)"></td>
+      <td id="wed17" onclick = "createEvent(id)"></td>
+      <td id="thu17" onclick = "createEvent(id)"></td>
+      <td id="fri17" onclick = "createEvent(id)"></td>
+      <td id="sat17" onclick = "createEvent(id)"></td>
+      <td id="sun17" onclick = "createEvent(id)"></td>
+  </tr>
+  <tr>
+      <th class = "hour" >18:00</th>
+      <td id="mon18" onclick = "createEvent(id)"></td>
+      <td id="tue18" onclick = "createEvent(id)"></td>
+      <td id="wed18" onclick = "createEvent(id)"></td>
+      <td id="thu18" onclick = "createEvent(id)"></td>
+      <td id="fri18" onclick = "createEvent(id)"></td>
+      <td id="sat18" onclick = "createEvent(id)"></td>
+      <td id="sun18" onclick = "createEvent(id)"></td>
+  </tr>
+  </table>
+  <div id="buttonContainer">
+
+   
+      <input type = "text" id = eventName><br>
+      <select id="dayOfWeek" name="dayOfWeek">
+        <option value="mon">Select Day</option>
+        <option value="mon">Monday</option>
+        <option value="tue">Tuesday</option>
+        <option value="wed">Wednesday</option>
+        <option value="thu">Thursday</option>
+        <option value="fri">Friday</option>
+        <option value="sat">Saturday</option>
+        <option value="sun">Sunday</option>
+      </select><br>
+      <input type = "time" id = "eventTime"><br>
+      <button class="createEventButton" id="createEventButton" onClick="handleCreateEvent()">Create Event</button>
+    
+
+    <button class="createEventButton" id="createEventButton" onClick="deleteEvent()">Delete Event</button>
+
+    <button class="createEventButton" id="createEventButton" onClick="clearSchedule()">Clear Schedule</button>
+
+  </div>
+
+</body>
+
+</html>
