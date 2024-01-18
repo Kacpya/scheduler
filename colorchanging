@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <script>
+
+    var eventDay = "";
+    var eventHour = 0;
+    var eventName = "";
+
+    function createEvents(eventDayAndHours) {
+
+      eventDay = eventDayAndHours.substring(0,3);
+      eventHour = eventDayAndHours.substring(3);
+        
+      eventName = "";
+      var popup = document.getElementById('popup');
+      document.getElementById('popup').style.display = 'block';
+
+      console.log("Event Day: " + eventDay);
+      console.log("Event Hour: " + eventHour);
+    }
+
+    function displayEvents() {
+        var eventName = document.getElementById('eventName').value;
+        var submitButton = document.getElementById('submitEventButton');
+
+         if (eventName != null && eventHour > 6 && eventHour < 19) {
+            var cellId = eventDay + eventHour;
+            var cell = document.getElementById(cellId);
+            cell.innerHTML = eventName;
+            cell.style.backgroundColor = document.getElementById("colorDropdown").value; // Change this to the desired color
+             } else {
+            alert("Invalid"); // Check
+                }
+            document.getElementById('popup').style.display = 'none';
+}
+  </script>
+
+  <style>
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    td {
+      border: 1px solid black;
+      padding: 8px;
+      text-align: center;
+    }
+
+    th {
+      background-color: #e0e0e0;
+    }
+
+    button {
+      display: inline-block;
+      padding: 12px 24px;
+      background-color: #3498db;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+      transition: background-color 0.3s;
+    }
+
+    .buttonContainer {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px;
+    }
+
+    .popup {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      text-align: center;
+      z-index: 1;
+    }
+
+    .popup-content {
+      position: relative;
+      top: 50%;
+      transform: translateY(-50%);
+      background: #fff;
+      padding: 20px;
+      width: 300px;
+      margin: 0 auto;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    }
+
+  </style>
+</head>
+
+<body>
+  <table onload="generatetable(1)">
+    <tr>
+        <th></th>
+        <th onclick = "generatetable(5)">Mon</th>
+        <th>Tue</th>
+        <th>Wed</th>
+        <th>Thu</th>
+        <th>Fri</th>
+        <th>Sat</th>
+        <th>Sun</th>
+    </tr>
+    <tr>
+      <th class = "hour" >07:00</th>
+      <td id="mon7" onclick = "createEvents(id)"></td>
+      <td id="tue7" onclick = "createEvents(id)"></td>
+      <td id="wed7" onclick = "createEvents(id)"></td>
+      <td id="thu7" onclick = "createEvents(id)"></td>
+      <td id="fri7" onclick = "createEvents(id)"></td>
+      <td id="sat7" onclick = "createEvents(id)"></td>
+      <td id="sun7" onclick = "createEvents(id)"></td>
+  </tr>
+  <tr>
+      <th>08:00</th>
+      <td id="mon8" onclick = "createEvents(id)"></td>
+      <td id="tue8" onclick = "createEvents(id)"></td>
+      <td id="wed8" onclick = "createEvents(id)"></td>
+      <td id="thu8" onclick = "createEvents(id)"></td>
+      <td id="fri8" onclick = "createEvents(id)"></td>
+      <td id="sat8" onclick = "createEvents(id)"></td>
+      <td id="sun8" onclick = "createEvents(id)"></td>
+  </tr>
+  <tr>
+      <th class = "hour" >09:00</th>
+      <td id="mon9" onclick = "createEvents(id)"></td>
+      <td id="tue9" onclick = "createEvents(id)"></td>
+      <td id="wed9" onclick = "createEvents(id)"></td>
+      <td id="thu9" onclick = "createEvents(id)"></td>
+      <td id="fri9" onclick = "createEvents(id)"></td>
+      <td id="sat9" onclick = "createEvents(id)"></td>
+      <td id="sun9" onclick = "createEvents(id)"></td>
+  </tr>
+  <tr>
+      <th class = "hour">10:00</th>
+      <td id="mon10" onclick = "createEvents(id)"></td>
+      <td id="tue10" onclick = "createEvents(id)"></td>
+      <td id="wed10" onclick = "createEvents(id)"></td>
+      <td id="thu10" onclick = "createEvents(id)"></td>
+      <td id="fri10" onclick = "createEvents(id)"></td>
+      <td id="sat10" onclick = "createEvents(id)"></td>
+      <td id="sun10" onclick = "createEvents(id)"></td>
+  </tr>
+  <tr>
+      <th class = "hour" >11:00</th>
+      <td id="mon11" onclick = "createEvents(id)"></td>
+      <td id="tue11" onclick = "createEvents(id)"></td>
+      <td id="wed11" onclick = "createEvents(id)"></td>
+      <td id="thu11" onclick = "createEvents(id)"></td>
+      <td id="fri11" onclick = "createEvents(id)"></td>
+      <td id="sat11" onclick = "createEvents(id)"></td>
+      <td id="sun11" onclick = "createEvents(id)"></td>
+  </tr>
+  <tr>
+      <th class = "hour">12:00</th>
+      <td id="mon12" onclick = "createEvents(id)"></td>
+      <td id="tue12" onclick = "createEvents(id)"></td>
+      <td id="wed12" onclick = "createEvents(id)"></td>
+      <td id="thu12" onclick = "createEvents(id)"></td>
+      <td id="fri12" onclick = "createEvents(id)"></td>
+      <td id="sat12" onclick = "createEvents(id)"></td>
+      <td id="sun12" onclick = "createEvents(id)"></td>
+  </tr>
+  <tr>
+      <th class = "hour" >13:00</th>
+      <td id="mon13" onclick = "createEvents(id)"></td>
+      <td id="tue13" onclick = "createEvents(id)"></td>
+      <td id="wed13" onclick = "createEvents(id)"></td>
+      <td id="thu13" onclick = "createEvents(id)"></td>
+      <td id="fri13" onclick = "createEvents(id)"></td>
+      <td id="sat13" onclick = "createEvents(id)"></td>
+      <td id="sun13" onclick = "createEvents(id)"></td>
+  </tr>
+  <tr>
+      <th class = "hour">14:00</th>
+      <td id="mon14" onclick = "createEvents(id)"></td>
+      <td id="tue14" onclick = "createEvents(id)"></td>
+      <td id="wed14" onclick = "createEvents(id)"></td>
+      <td id="thu14" onclick = "createEvents(id)"></td>
+      <td id="fri14" onclick = "createEvents(id)"></td>
+      <td id="sat14" onclick = "createEvents(id)"></td>
+      <td id="sun14" onclick = "createEvents(id)"></td>
+  </tr>
+  <tr>
+      <th class = "hour">15:00</th>
+      <td id="mon15" onclick = "createEvents(id)"></td>
+      <td id="tue15" onclick = "createEvents(id)"></td>
+      <td id="wed15" onclick = "createEvents(id)"></td>
+      <td id="thu15" onclick = "createEvents(id)"></td>
+      <td id="fri15" onclick = "createEvents(id)"></td>
+      <td id="sat15" onclick = "createEvents(id)"></td>
+      <td id="sun15" onclick = "createEvents(id)"></td>
+  </tr>
+  <tr>
+      <th class = "hour" >16:00</th>
+      <td id="mon16" onclick = "createEvents(id)"></td>
+      <td id="tue16" onclick = "createEvents(id)"></td>
+      <td id="wed16" onclick = "createEvents(id)"></td>
+      <td id="thu16" onclick = "createEvents(id)"></td>
+      <td id="fri16" onclick = "createEvents(id)"></td>
+      <td id="sat16" onclick = "createEvents(id)"></td>
+      <td id="sun16" onclick = "createEvents(id)"></td>
+  </tr>
+  <tr>
+      <th class = "hour" >17:00</th>
+      <td id="mon17" onclick = "createEvents(id)"></td>
+      <td id="tue17" onclick = "createEvents(id)"></td>
+      <td id="wed17" onclick = "createEvents(id)"></td>
+      <td id="thu17" onclick = "createEvents(id)"></td>
+      <td id="fri17" onclick = "createEvents(id)"></td>
+      <td id="sat17" onclick = "createEvents(id)"></td>
+      <td id="sun17" onclick = "createEvents(id)"></td>
+  </tr>
+  <tr>
+      <th class = "hour" >18:00</th>
+      <td id="mon18" onclick = "createEvents(id)"></td>
+      <td id="tue18" onclick = "createEvents(id)"></td>
+      <td id="wed18" onclick = "createEvents(id)"></td>
+      <td id="thu18" onclick = "createEvents(id)"></td>
+      <td id="fri18" onclick = "createEvents(id)"></td>
+      <td id="sat18" onclick = "createEvents(id)"></td>
+      <td id="sun18" onclick = "createEvents(id)"></td>
+  </tr>
+  </table>
+
+  <div id="popup" class="popup">
+    <div class="popup-content">
+        <span onclick="closePopup()" class="close">&times;</span>
+
+        <label for="eventName">Event Name:</label>
+        <input type="text" id="eventName" placeholder="Enter Event Name" required>
+
+        <label for="colorDropdown">Select a color:</label>
+        <select id="colorDropdown">
+            <option value="red">Red</option>
+            <option value="green">Green</option>
+            <option value="blue">Blue</option>
+            <option value="yellow">Yellow</option>
+            <option value="orange">Orange</option>
+        </select>
+
+        <button class="createEventButton" id="createEventButton" onClick="displayEvents()">Create Event</button> 
+    </div>
+</div>>
+
+  <!--
+  <div id="buttonContainer">
+
+    <button class="createEventButton" id="createEventButton" onClick="deleteEvent()">Delete Event</button>
+
+    <button class="createEventButton" id="createEventButton" onClick="clearSchedule()">Clear Schedule</button>
+
+  </div>
+-->
+</body>
+
+</html>
