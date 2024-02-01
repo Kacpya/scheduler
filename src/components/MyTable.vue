@@ -48,6 +48,7 @@ function getDate() {
 
       //document.getElementById("mon").value = "Boo";
 }
+
 function createEvent() { //used for creating events
   popupVisible.value = false;
   const eventNameValue = eventName.value;
@@ -244,11 +245,44 @@ function deleteEvent() {
       <!-- Add more color options as needed -->
     </select>
 
-    <button class="createEventButton" @click="createEvent()">Create Event</button>
+    <!--<button class="createEventButton" @click= "createEvent()">Create Event</button>-->
+    <button class="createEventButton" @click= "createEvent()">Store Event</button>
 
     <label>Make Persistent: </label>
     <input type="checkbox" name="availableDays" value="mon">
   </div>
+
+<!--<script>
+import app from '../api/firebase';
+import { getFunctions, httpsCallable } from "firebase/functions";
+
+export default {
+    data() {
+        return {
+            handle: '',
+            comment: ''
+        }
+
+    },
+    methods: {
+        storeEvent() {
+            console.log(this.handle);
+            console.log(this.comment);
+            const functions = getFunctions(app);
+            console.log(app);
+            const postComment = httpsCallable(functions, 'postcomment');
+            postComment({ "handle": this.handle, "comment": this.comment })
+                .then((result) => {
+                    // Read result of the Cloud Function.
+                    /** @type {any} */
+                    console.log(result);
+                });
+        }
+    }
+  }
+
+</script>
+-->
 
   <div id="popupEdit" v-if="EditpopupVisible" class="popup-content">
     <span @click="closePopup()" class="close">&times;</span>
@@ -278,6 +312,8 @@ function deleteEvent() {
       </tr>
     </table>
   </div>
+
+
 
 
   <div id="popupCreate" v-if="CreatepopupVisible" class="popup-content">
