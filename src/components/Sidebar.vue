@@ -1,7 +1,7 @@
 <template>
   <div class="menu-container">
     <div class="logo-container">
-      <img src="C:\Users\mbunc\samplevue\src\assets\logo.png">
+      <a href="https://imgbox.com/0bBpBZDc" target="_blank"><img src="https://thumbs2.imgbox.com/1a/8b/0bBpBZDc_t.png" alt="Logo"/></a>
     </div>
 
     <aside class="sidebar">
