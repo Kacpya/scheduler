@@ -101,5 +101,4 @@ function cellId(day, hour) {
 </template>
 
 <style scoped>
-/* Add your styles here */
 </style>
