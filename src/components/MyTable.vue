@@ -31,7 +31,7 @@ function handleEvent(action) {
   if (action === 'create') {
     createEvent(eventDetails.value);
   } else if (action === 'edit') {
-    // Implement edit logic here
+    editEvent(eventDetails.value);
   } else if (action === 'delete') {
     deleteEvent(eventDetails.value);
   }
@@ -42,7 +42,7 @@ function createEvent(eventDetails) {
   const event = {
     day,
     hour,
-    name: eventName.value // Get the name from the reactive reference
+    name: eventName.value
   };
   events.value.push(event);
   CreatepopupVisible.value = false;
@@ -53,9 +53,18 @@ function deleteEvent(eventDetails) {
   if (index !== -1) {
     events.value.splice(index, 1);
   }
-  EditpopupVisible.value = false; // Close the popup after deleting the event
+  EditpopupVisible.value = false;
 }
 
+  function editEvent(eventDetails) {
+  const index = events.value.findIndex(event => event.day === eventDetails.day && event.hour === eventDetails.hour);
+  if (index !== -1) {
+    const existingEvent = events.value[index];
+    existingEvent.name = eventName.value;
+    EditpopupVisible.value = false;
+  }
+}
+  
 function getEventName(day, hour) {
   const event = events.value.find(event => event.day === day && event.hour === hour);
   return event ? event.name : '';
