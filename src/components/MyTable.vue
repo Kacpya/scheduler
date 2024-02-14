@@ -14,15 +14,30 @@ const eventName = ref('');
 
 const padZero = (num) => (num < 10 ? `0${num}` : num);
 
-const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+// Function to get the dates for each day of the week 
+const getDateForDayOfWeek = (dayOfWeek) => {
+  const today = new Date();
+  const targetDate = new Date(today);
+  const currentDayOfWeek = today.getDay(); // 0 = Sunday, ..., 6 = Saturday
+  const daysToAdd = dayOfWeek - currentDayOfWeek;
+  targetDate.setDate(targetDate.getDate() + daysToAdd);
+  return targetDate;
+};
+
+const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, index) => {
+  const targetDate = getDateForDayOfWeek(index + 1);
+  return { name: day, date: targetDate };
+});
+  
 const hours = Array.from({ length: 24 }, (_, i) => i);
 
 function clickCell(day, hour) {
-  eventDetails.value = { day, hour };
-  const cellContent = getEventName(day, hour);
+  eventDetails.value = { day: day.name, hour };
+  const cellContent = getEventName(day.name, hour);
   if (cellContent) {
     EditpopupVisible.value = true;
   } else {
+    EditpopupVisible.value = false;
     CreatepopupVisible.value = true;
   }
 }
@@ -45,6 +60,7 @@ function createEvent(eventDetails) {
     name: eventName.value
   };
   events.value.push(event);
+  eventName.value = '';
   CreatepopupVisible.value = false;
 }
 
@@ -61,6 +77,7 @@ function deleteEvent(eventDetails) {
   if (index !== -1) {
     const existingEvent = events.value[index];
     existingEvent.name = eventName.value;
+    eventName.value = '';
     EditpopupVisible.value = false;
   }
 }
@@ -93,14 +110,16 @@ function cellId(day, hour) {
         <thead>
           <tr>
             <th></th>
-            <th v-for="day in days" :key="day">{{ day }}</th>
+            <th v-for="day in days" :key="day.name">
+              {{ day.name }} {{ day.date.getDate() }}
+            </th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="hour in hours" :key="hour">
             <th class="hour">{{ padZero(hour) }}:00</th>
-            <td v-for="day in days" :key="day + hour" @click="clickCell(day, hour)" :id="cellId(day, hour)">
-              {{ getEventName(day, hour) }}
+            <td v-for="day in days" :key="day + hour" @click="clickCell(day, hour)" :id="cellId(day.name, hour)">
+              {{ getEventName(day.name, hour) }}
             </td>
           </tr>
         </tbody>
