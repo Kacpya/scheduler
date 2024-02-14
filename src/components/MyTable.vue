@@ -28,7 +28,7 @@ const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, index) 
   const targetDate = getDateForDayOfWeek(index + 1);
   return { name: day, date: targetDate };
 });
-  
+
 const hours = Array.from({ length: 24 }, (_, i) => i);
 
 function clickCell(day, hour) {
@@ -72,7 +72,7 @@ function deleteEvent(eventDetails) {
   EditpopupVisible.value = false;
 }
 
-  function editEvent(eventDetails) {
+function editEvent(eventDetails) {
   const index = events.value.findIndex(event => event.day === eventDetails.day && event.hour === eventDetails.hour);
   if (index !== -1) {
     const existingEvent = events.value[index];
@@ -81,7 +81,7 @@ function deleteEvent(eventDetails) {
     EditpopupVisible.value = false;
   }
 }
-  
+
 function getEventName(day, hour) {
   const event = events.value.find(event => event.day === day && event.hour === hour);
   return event ? event.name : '';
@@ -94,7 +94,8 @@ function cellId(day, hour) {
 
 <template>
   <div class="container">
-    <div v-if="CreatepopupVisible" class="popup">
+    <div class="site-content">
+      <div v-if="CreatepopupVisible" class="popup">
       <h2>Create Event</h2>
       <input type="text" v-model="eventName" id="createEventName" placeholder="Event Name">
       <button @click="handleEvent('create')">Save</button>
@@ -126,7 +127,9 @@ function cellId(day, hour) {
       </table>
     </div>
   </div>
+</div>
 </template>
 
 <style scoped>
+/* Add your styles here */
 </style>
