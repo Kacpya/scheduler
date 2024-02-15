@@ -1,7 +1,5 @@
 @import './base.css';
 
-
-
 .container {
   max-width: 1000px;
   margin-left: auto;
@@ -11,12 +9,12 @@
 }
 
 .site-content {
-  margin-top: 200px; /* Adjust margin to accommodate the menu bar height */
+  margin-top: 100px; /* Adjust margin to accommodate the menu bar height */
 }
 
 h1 {
   font-size: 30px;
-  color: #fff;
+  color: #9c2828;
   text-transform: uppercase;
   font-weight: 300;
   text-align: center;
@@ -184,7 +182,7 @@ header {
   position: fixed; /* Set position to fixed */
   width: 100%; /* Make it span the full width */
   top: 0; /* Stick to the top of the viewport */
-  background-color: #ffffff; /* Adjust background color as needed */
+  background-color: #000000; /* Adjust background color as needed */
   z-index: 1000; /* Ensure it appears above other content */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add a shadow for depth */
 }
@@ -217,7 +215,7 @@ nav ul li {
 }
 
 nav ul li a {
-  color: #333; /* Dark text color */
+  color: #dbd9d9; /* Dark text color */
   text-decoration: none;
   padding: 10px 20px;
   transition: color 0.3s ease, background-color 0.3s ease;
@@ -282,37 +280,47 @@ nav ul li:hover ul {
   margin-left: 230px;
 }
 
-/* LoginFile.vue */
-
-.login-container {
-  max-width: 300px;
-  margin: 0 auto;
-  padding: 20px;
-  border: 1px transparent;
-  border-radius: 5px;
+.form-container {
+  max-width: 200px; /* Adjust as needed */
+  margin: 0 auto; /* Center the container */
+  padding: 20px; /* Add padding for spacing */
+  margin-top: 50px; /* Adjust vertical spacing */
 }
 
-.loginFileButton {
-  background-color: #4caf50;
-  color: white;
-  padding: 10px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
+.current-date {
+  background-color: rgba(173, 216, 230, 0.365); /* You can adjust the background color */
 }
 
-.login_error-message {
-  color: #ff0000;
-  margin-top: 10px;
+.page-container {
+  display: flex;
 }
 
-.login_Label {
-  display: block;
-  margin-bottom: 5px;
+
+.calendar-container {
+  width: 300px;
+  margin-right: 100px;
 }
 
-.login_Input {
+.real-time-calendar {
+  font-family: Arial, sans-serif;
+  background-color: #08060b6f;
+  padding: 10px; 
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add a shadow for depth */
+
+}
+
+.real-time-calendar table {
   width: 100%;
-  padding: 8px;
-  margin-bottom: 10px;
+  border-collapse: collapse;
+  
+}
+
+.real-time-calendar th,
+.real-time-calendar td {
+  padding: 5px;
+  text-align: center;
+}
+
+.current-day {
+  background-color: lightblue;
 }
