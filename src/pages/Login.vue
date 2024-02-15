@@ -1,5 +1,5 @@
 <script setup>
-import Sidebar from '../components/Sidebar.vue'
+import Header from '../components/Header.vue'
 import LoginFile from '../components/LoginFile.vue'
 </script>
 <template>
@@ -7,7 +7,7 @@ import LoginFile from '../components/LoginFile.vue'
   <button> Boo </button>
 
 
-  <Sidebar/>
+  <Header/>
   <LoginFile/>
 
 
