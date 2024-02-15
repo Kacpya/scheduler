@@ -90,46 +90,50 @@ function getEventName(day, hour) {
 function cellId(day, hour) {
   return `cell-${day}-${hour}`;
 }
+
+function isCurrentDate(date) {
+  const today = new Date();
+  return date.getDate() === today.getDate() &&
+         date.getMonth() === today.getMonth() &&
+         date.getFullYear() === today.getFullYear();
+}
 </script>
 
 <template>
   <div class="container">
     <div class="site-content">
       <div v-if="CreatepopupVisible" class="popup">
-      <h2>Create Event</h2>
-      <input type="text" v-model="eventName" id="createEventName" placeholder="Event Name">
-      <button @click="handleEvent('create')">Save</button>
-    </div>
-    <div v-if="EditpopupVisible" class="popup">
-      <h2>Edit Event</h2>
-      <input type="text" v-model="eventName" id="editEventName" placeholder="Event Name">
-      <button @click="handleEvent('edit')">Save Changes</button>
-      <button @click="handleEvent('delete')">Delete</button>
-    </div>
-    <div class="table-wrapper">
-      <table class="fl-table">
-        <thead>
-          <tr>
-            <th></th>
-            <th v-for="day in days" :key="day.name">
-              {{ day.name }} {{ day.date.getDate() }}
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="hour in hours" :key="hour">
-            <th class="hour">{{ padZero(hour) }}:00</th>
-            <td v-for="day in days" :key="day + hour" @click="clickCell(day, hour)" :id="cellId(day.name, hour)">
-              {{ getEventName(day.name, hour) }}
-            </td>
-          </tr>
-        </tbody>
-      </table>
+        <h2>Create Event</h2>
+        <input type="text" v-model="eventName" id="createEventName" placeholder="Event Name">
+        <button @click="handleEvent('create')">Save</button>
+      </div>
+      <div v-if="EditpopupVisible" class="popup">
+        <h2>Edit Event</h2>
+        <input type="text" v-model="eventName" id="editEventName" placeholder="Event Name">
+        <button @click="handleEvent('edit')">Save Changes</button>
+        <button @click="handleEvent('delete')">Delete</button>
+      </div>
+      <div class="table-wrapper">
+        <table class="fl-table">
+          <thead>
+            <tr>
+              <th></th>
+              <th v-for="day in days" :key="day.name">
+                {{ day.name }} {{ day.date.getDate() }}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="hour in hours" :key="hour">
+              <th class="hour">{{ padZero(hour) }}:00</th>
+              <td v-for="day in days" :key="day + hour" @click="clickCell(day, hour)" :id="cellId(day.name, hour)" :class="{ 'current-date': isCurrentDate(day.date) }">
+                {{ getEventName(day.name, hour) }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
-</div>
 </template>
 
-<style scoped>
-/* Add your styles here */
-</style>
