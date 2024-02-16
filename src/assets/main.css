@@ -1,5 +1,7 @@
 @import './base.css';
 
+
+
 .container {
   max-width: 1000px;
   margin-left: auto;
@@ -95,7 +97,23 @@ body {
   width: 9%;
 }
 
+.navigation-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
 
+.navigation-buttons button {
+  padding: 8px 16px;
+  border: 1px solid #007bff;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+}
+
+.navigation-buttons button:hover {
+  background-color: #0056b3;
+}
 
 .event {
   position: absolute;
