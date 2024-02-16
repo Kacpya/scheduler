@@ -163,6 +163,37 @@ button {
   border: 1px solid black;
 }
 
+.popup-wrapper {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 9999; /* Ensure the popup appears on top of other content */
+}
+
+.close-button {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 25px;
+  height: 25px;
+  background-color: red;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.popup {
+  position: relative;
+}
+
+.close-button:hover {
+  background-color: darkred;
+}
+
 .close {
   color: red;
   float: right;
@@ -342,3 +373,4 @@ nav ul li:hover ul {
 .current-day {
   background-color: lightblue;
 }
+
