@@ -57,29 +57,28 @@ function updateDays() {
 }
 
 function clickCell(day, hour) {
-  const cellContent = getEventName(day.name, hour);
-  if (cellContent) {
+  const event = events.value.find(event =>
+    event.day === day.name && event.hour <= hour && hour < event.hour + event.duration
+  );
+
+  if (event) {
+    const earliestHour = event.hour;
+    eventDetails.value = {
+      day: event.day,
+      startHour: earliestHour,
+      endHour: earliestHour + event.duration - 1,
+      duration: event.duration
+    };
+    eventName.value = event.name;
     EditpopupVisible.value = true;
   } else {
-    // Check if there's an event occupying this cell
-    const existingEvent = events.value.find(event => {
-      const eventStartHour = event.hour;
-      const eventEndHour = event.hour + event.duration - 1; // Calculate event end hour
-      return event.day === day.name && hour >= eventStartHour && hour <= eventEndHour;
-    });
-
-    if (existingEvent) {
-      // If there's an event occupying this cell, open edit popup for that event
-      eventDetails.value = { day: existingEvent.day, startHour: existingEvent.hour, duration: existingEvent.duration };
-      eventName.value = existingEvent.name;
-      EditpopupVisible.value = true;
-    } else {
-      // Otherwise, open create popup for a new event
-      eventDetails.value = { day: day.name, startHour: hour, duration: 1 };
-      CreatepopupVisible.value = true;
-    }
+    eventDetails.value = { day: day.name, startHour: hour, endHour: hour, duration: 1 };
+    EditpopupVisible.value = false;
+    CreatepopupVisible.value = true;
   }
 }
+
+
 
 function handleEvent(action) {
   if (action === 'create') {
@@ -92,47 +91,120 @@ function handleEvent(action) {
 }
 
 function createEvent(eventDetails) {
-  const { day, startHour, duration } = eventDetails; // Modified to include duration
-  for (let i = 0; i < duration; i++) {
+  const { day, startHour, endHour } = eventDetails;
+  const randomColor = getRandomColor();
+  const eventNameValue = eventName.value; // Get the event name only once
+
+  for (let i = startHour; i <= endHour; i++) {
     const event = {
       day,
-      hour: startHour + i,
-      name: eventName.value
+      hour: i,
+      name: i === startHour ? eventNameValue : '', // Set event name only for the start hour
+      duration: endHour - startHour + 1,
+      color: randomColor
     };
     events.value.push(event);
+
+    const cell = document.getElementById(cellId(day, i));
+    if (cell) {
+      cell.style.backgroundColor = randomColor; // Set background color for all cells in the event's duration
+    }
   }
   eventName.value = '';
   CreatepopupVisible.value = false;
 }
 
-function deleteEvent(eventDetails) {
-  const { day, startHour, duration } = eventDetails; // Modified to include duration
-  for (let i = 0; i < duration; i++) {
-    const index = events.value.findIndex(event => event.day === day && event.hour === startHour + i);
-    if (index !== -1) {
-      events.value.splice(index, 1);
-    }
-  }
-  EditpopupVisible.value = false;
-}
-
 function editEvent(eventDetails) {
-  const { day, startHour, duration } = eventDetails; // Modified to include duration
+  const { day, startHour, endHour } = eventDetails;
+
+  // Find the index of the existing event
+  const index = events.value.findIndex(event =>
+    event.day === day && event.hour === startHour
+  );
+
+  // If the event exists, update it; otherwise, return
+  if (index !== -1) {
+    const existingEvent = events.value[index];
+
+    // Remove the existing event's cells
+for (let i = existingEvent.hour; i < existingEvent.hour + existingEvent.duration; i++) {
+  const cell = document.getElementById(cellId(day, i));
+  if (cell) {
+    cell.style.backgroundColor = ''; // Clear background color of the cell in the existing event's duration
+  }
+}
+
+
+
+    // Remove the existing event from the events array
+    events.value.splice(index, 1);
+
+    // Add the new event to the events array
+    const newEvent = {
+      day: day,
+      hour: startHour,
+      duration: endHour - startHour + 1,
+      name: eventName.value ? eventName.value : '',
+      color: getRandomColor()
+    };
+    events.value.push(newEvent);
+
+    // Set background color for all cells in the new event's duration
+    for (let i = startHour; i <= endHour; i++) {
+      const cell = document.getElementById(cellId(day, i));
+      if (cell) {
+        cell.style.backgroundColor = newEvent.color;
+      }
+    }
+
+  } else {
+    return; // If the event does not exist, return without making any changes
+  }
+
+  // Clear input fields and close the edit popup
+  eventName.value = '';
+  EditpopupVisible.value = false;
+}
+
+
+
+
+function getRandomColor() {
+  // Generate random RGB values
+  const r = Math.floor(Math.random() * 256);
+  const g = Math.floor(Math.random() * 256);
+  const b = Math.floor(Math.random() * 256);
+  // Convert to hex format
+  const color = '#' + r.toString(16) + g.toString(16) + b.toString(16);
+  return color;
+}
+
+
+function deleteEvent(eventDetails) {
+  const { day, startHour, duration } = eventDetails;
   for (let i = 0; i < duration; i++) {
     const index = events.value.findIndex(event => event.day === day && event.hour === startHour + i);
     if (index !== -1) {
-      const existingEvent = events.value[index];
-      existingEvent.name = eventName.value;
-      eventName.value = '';
+      const deletedEvent = events.value.splice(index, 1)[0]; // Remove the event and get the deleted event
+      for (let j = 0; j < deletedEvent.duration; j++) {
+        const cell = document.getElementById(cellId(day, startHour + j));
+        if (cell) {
+          cell.style.backgroundColor = ''; // Clear background color of all cells in the event's duration
+        }
+      }
     }
   }
   EditpopupVisible.value = false;
 }
 
-function getEventName(day, hour) {
-  const event = events.value.find(event => event.day === day && event.hour === hour);
-  return event ? event.name : '';
+
+
+
+function closePopup() {
+  CreatepopupVisible.value = false;
+  EditpopupVisible.value = false;
 }
+
 
 function cellId(day, hour) {
   return `cell-${day}-${hour}`;
@@ -141,8 +213,8 @@ function cellId(day, hour) {
 function isCurrentDate(date) {
   const today = new Date();
   return date.getDate() === today.getDate() &&
-         date.getMonth() === today.getMonth() &&
-         date.getFullYear() === today.getFullYear();
+    date.getMonth() === today.getMonth() &&
+    date.getFullYear() === today.getFullYear();
 }
 
 function moveToLastWeek() {
@@ -160,6 +232,14 @@ function moveToNextWeek() {
     days.value[i].date = targetDate;
   }
 }
+
+// Modify the getEventName function to return the event name only for the start hour
+function getEventName(day, hour) {
+  const event = events.value.find(
+    (event) => event.day === day && event.hour === hour
+  );
+  return event ? event.name : '';
+}
 </script>
 
 
@@ -167,19 +247,31 @@ function moveToNextWeek() {
 <template>
   <div class="container">
     <div class="site-content">
-      <div v-if="CreatepopupVisible" class="popup">
-        <h2>Create Event</h2>
-        <input type="text" v-model="eventName" id="createEventName" placeholder="Event Name">
-        <input type="number" v-model="eventDetails.duration" min="1" placeholder="Duration (hours)">
-        <button @click="handleEvent('create')">Save</button>
+      <div class="popup-wrapper" v-if="CreatepopupVisible || EditpopupVisible">
+  <div v-if="CreatepopupVisible || EditpopupVisible" class="popup">
+    <button class="close-button" @click="closePopup">&#10006;</button>
+          <h2>{{ EditpopupVisible ? 'Edit Event' : 'Create Event' }}</h2>
+          <input type="text" v-model="eventName" :id="EditpopupVisible ? 'editEventName' : 'createEventName'"
+            placeholder="Event Name">
+          <div>
+            <label for="startHour">Start Hour:</label>
+            <input type="number" v-model="eventDetails.startHour" min="0" max="23" required>
+          </div>
+          <div>
+            <label for="endHour">End Hour:</label>
+            <input type="number" v-model="eventDetails.endHour" min="0" max="23" required>
+          </div>
+
+          <template v-if="EditpopupVisible">
+            <button @click="handleEvent('edit')">Save Changes</button>
+            <button @click="handleEvent('delete')">Delete</button>
+          </template>
+          <template v-else>
+            <button @click="handleEvent('create')">Save</button>
+          </template>
+        </div>
       </div>
-      <div v-if="EditpopupVisible" class="popup">
-        <h2>Edit Event</h2>
-        <input type="text" v-model="eventName" id="editEventName" placeholder="Event Name">
-        <input type="number" v-model="eventDetails.duration" min="1" placeholder="Duration (hours)">
-        <button @click="handleEvent('edit')">Save Changes</button>
-        <button @click="handleEvent('delete')">Delete</button>
-      </div>
+
       <!-- Buttons for navigating to next and last weeks -->
       <div class="week-navigation">
         <button @click="moveToLastWeek">Last Week</button>
@@ -202,7 +294,8 @@ function moveToNextWeek() {
           <tbody>
             <tr v-for="hour in hours" :key="hour">
               <th class="hour">{{ padZero(hour) }}:00</th>
-              <td v-for="day in days" :key="day + hour" @click="clickCell(day, hour)" :id="cellId(day.name, hour)" :class="{ 'current-date': isCurrentDate(day.date) }">
+              <td v-for="day in days" :key="day + hour" @click="clickCell(day, hour)" :id="cellId(day.name, hour)"
+                :class="{ 'current-date': isCurrentDate(day.date) }">
                 {{ getEventName(day.name, hour) }}
               </td>
             </tr>
