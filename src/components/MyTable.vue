@@ -1,308 +1,365 @@
+
+
 <script setup>
+
+getDate();
+
 import { ref } from 'vue';
 
-const props = defineProps({
-  cellId: String,
-});
+const eventDay = ref("");
+const eventHour = ref(0);
+const eventName = ref("");
 
-const EditpopupVisible = ref(false);
 const CreatepopupVisible = ref(false);
-const events = ref([]);
+const popupVisible = ref(false); //popup for creating an event
+const EditpopupVisible = ref(false); //popup for editing an event
 
-const eventDetails = ref({ day: '', startHour: '', duration: 1 }); // Modified to include duration
-const eventName = ref('');
+function clickCell(eventDayAndHours) { //this function will open a popup, based on the contents of the cell
+  eventDay.value = eventDayAndHours.substring(0, 3);
+  eventHour.value = parseInt(eventDayAndHours.substring(3));
 
-const padZero = (num) => (num < 10 ? `0${num}` : num);
+  let cellId = eventDay.value + eventHour.value;
+  let cell = document.getElementById(cellId);
 
-// Function to get the dates for each day of the week 
-const getDateForDayOfWeek = (dayOfWeek) => {
-  const today = new Date();
-  const targetDate = new Date(today);
-  const currentDayOfWeek = today.getDay(); // 0 = Sunday, ..., 6 = Saturday
-  const daysToAdd = dayOfWeek - currentDayOfWeek;
-  targetDate.setDate(targetDate.getDate() + daysToAdd);
-  return targetDate;
-};
-
-const days = ref([]);
-const hours = Array.from({ length: 24 }, (_, i) => i);
-const showPastEvents = ref(false);
-
-// Initialize days with the current week
-updateDays();
-
-function updateDays() {
-  const currentDate = new Date();
-  const currentWeekStart = new Date(currentDate);
-  currentWeekStart.setDate(currentDate.getDate() - currentDate.getDay()); // Start of current week (Sunday)
-
-  const currentWeekEnd = new Date(currentWeekStart);
-  currentWeekEnd.setDate(currentWeekStart.getDate() + 6); // End of current week (Saturday)
-
-  days.value = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, index) => {
-    const targetDate = new Date(currentWeekStart);
-    targetDate.setDate(currentWeekStart.getDate() + index);
-
-    // Filter events for the current day
-    const dayEvents = events.value.filter(event => {
-      const eventDate = new Date(event.date);
-      // Check if the event date is within the range of the current week
-      const withinRange = eventDate >= currentWeekStart && eventDate <= currentWeekEnd;
-      console.log(`Event: ${event.name}, Date: ${eventDate}, Within Range: ${withinRange}`);
-      return withinRange;
-    });
-
-    return { name: day, date: targetDate, events: dayEvents };
-  });
+  if (cell.innerHTML.trim() !== '') { //if cell is not empty
+    EditpopupVisible.value = true; //opens edit menu
+  }
+  else {
+    popupVisible.value = true; //opens creation menu
+  }
+  console.log("Event Day: " + eventDay.value);
+  console.log("Event Hour: " + eventHour.value);
+  console.log("Event Hour: " + cell.value);
 }
 
-function clickCell(day, hour) {
-  const event = events.value.find(event =>
-    event.day === day.name && event.hour <= hour && hour < event.hour + event.duration
-  );
+function getDate() {
+  let currentDate = new Date();
 
-  if (event) {
-    const earliestHour = event.hour;
-    eventDetails.value = {
-      day: event.day,
-      startHour: earliestHour,
-      endHour: earliestHour + event.duration - 1,
-      duration: event.duration
-    };
-    eventName.value = event.name;
-    EditpopupVisible.value = true;
-  } else {
-    eventDetails.value = { day: day.name, startHour: hour, endHour: hour, duration: 1 };
-    EditpopupVisible.value = false;
-    CreatepopupVisible.value = true;
-  }
+// Get the current date, month, and year
+  let dayOfWeek = currentDate.getDay();
+  let day = currentDate.getDate();
+  let month = currentDate.getMonth() + 1; // Months are zero-based, so we add 1
+  let year = currentDate.getFullYear();
+
+  let daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+// Output the current date
+  console.log("Current Date: " + year + "-" + (month < 10 ? "0" : "") + month + "-" + (day < 10 ? "0" : "") + day);
+
+      //document.getElementById("mon").value = "Boo";
 }
 
+function createEvent() { //used for creating events
+  popupVisible.value = false;
+  const eventNameValue = eventName.value;
 
-
-function handleEvent(action) {
-  if (action === 'create') {
-    createEvent(eventDetails.value);
-  } else if (action === 'edit') {
-    editEvent(eventDetails.value);
-  } else if (action === 'delete') {
-    deleteEvent(eventDetails.value);
+  if (eventNameValue && eventHour.value > 6 && eventHour.value < 19) {
+    let cellId = eventDay.value + eventHour.value;
+    let cell = document.getElementById(cellId);
+    cell.innerHTML = eventNameValue;
+    cell.style.backgroundColor = document.getElementById("colorDropdown").value; // Change this to the desired color
   }
+  else {
+    alert("invalid");
+  }
+
+  eventName.value = "";
+  closePopup();
 }
 
-function createEvent(eventDetails) {
-  const { day, startHour, endHour } = eventDetails;
-  const randomColor = getRandomColor();
-  const eventNameValue = eventName.value; // Get the event name only once
+function createEventButton() { //used for creating events
+  CreatepopupVisible.value = true;
+}
+function displayEvent() {
 
-  for (let i = startHour; i <= endHour; i++) {
-    const event = {
-      day,
-      hour: i,
-      name: i === startHour ? eventNameValue : '', // Set event name only for the start hour
-      duration: endHour - startHour + 1,
-      color: randomColor
-    };
-    events.value.push(event);
+}
 
-    const cell = document.getElementById(cellId(day, i));
-    if (cell) {
-      cell.style.backgroundColor = randomColor; // Set background color for all cells in the event's duration
-    }
-  }
-  eventName.value = '';
+function editEvent() {
+  closePopup();
+  alert("bana")
+}
+function closePopup() { //closes all popups
+  popupVisible.value = false;
+  EditpopupVisible.value = false;
   CreatepopupVisible.value = false;
 }
 
-function editEvent(eventDetails) {
-  const { day, startHour, endHour } = eventDetails;
-
-  // Find the index of the existing event
-  const index = events.value.findIndex(event =>
-    event.day === day && event.hour === startHour
-  );
-
-  // If the event exists, update it; otherwise, return
-  if (index !== -1) {
-    const existingEvent = events.value[index];
-
-    // Remove the existing event's cells
-for (let i = existingEvent.hour; i < existingEvent.hour + existingEvent.duration; i++) {
-  const cell = document.getElementById(cellId(day, i));
-  if (cell) {
-    cell.style.backgroundColor = ''; // Clear background color of the cell in the existing event's duration
-  }
-}
-
-
-
-    // Remove the existing event from the events array
-    events.value.splice(index, 1);
-
-    // Add the new event to the events array
-    const newEvent = {
-      day: day,
-      hour: startHour,
-      duration: endHour - startHour + 1,
-      name: eventName.value ? eventName.value : '',
-      color: getRandomColor()
-    };
-    events.value.push(newEvent);
-
-    // Set background color for all cells in the new event's duration
-    for (let i = startHour; i <= endHour; i++) {
-      const cell = document.getElementById(cellId(day, i));
-      if (cell) {
-        cell.style.backgroundColor = newEvent.color;
-      }
-    }
-
-  } else {
-    return; // If the event does not exist, return without making any changes
-  }
-
-  // Clear input fields and close the edit popup
-  eventName.value = '';
-  EditpopupVisible.value = false;
-}
-
-
-
-
-function getRandomColor() {
-  // Generate random RGB values
-  const r = Math.floor(Math.random() * 256);
-  const g = Math.floor(Math.random() * 256);
-  const b = Math.floor(Math.random() * 256);
-  // Convert to hex format
-  const color = '#' + r.toString(16) + g.toString(16) + b.toString(16);
-  return color;
-}
-
-
-function deleteEvent(eventDetails) {
-  const { day, startHour, duration } = eventDetails;
-  for (let i = 0; i < duration; i++) {
-    const index = events.value.findIndex(event => event.day === day && event.hour === startHour + i);
-    if (index !== -1) {
-      const deletedEvent = events.value.splice(index, 1)[0]; // Remove the event and get the deleted event
-      for (let j = 0; j < deletedEvent.duration; j++) {
-        const cell = document.getElementById(cellId(day, startHour + j));
-        if (cell) {
-          cell.style.backgroundColor = ''; // Clear background color of all cells in the event's duration
-        }
-      }
-    }
-  }
-  EditpopupVisible.value = false;
-}
-
-
-
-
-function closePopup() {
-  CreatepopupVisible.value = false;
-  EditpopupVisible.value = false;
-}
-
-
-function cellId(day, hour) {
-  return `cell-${day}-${hour}`;
-}
-
-function isCurrentDate(date) {
-  const today = new Date();
-  return date.getDate() === today.getDate() &&
-    date.getMonth() === today.getMonth() &&
-    date.getFullYear() === today.getFullYear();
-}
-
-function moveToLastWeek() {
-  for (let i = 0; i < days.value.length; i++) {
-    const targetDate = new Date(days.value[i].date);
-    targetDate.setDate(targetDate.getDate() - 7); // Move back 7 days (one week)
-    days.value[i].date = targetDate;
-  }
-}
-
-function moveToNextWeek() {
-  for (let i = 0; i < days.value.length; i++) {
-    const targetDate = new Date(days.value[i].date);
-    targetDate.setDate(targetDate.getDate() + 7); // Move forward 7 days (one week)
-    days.value[i].date = targetDate;
-  }
-}
-
-// Modify the getEventName function to return the event name only for the start hour
-function getEventName(day, hour) {
-  const event = events.value.find(
-    (event) => event.day === day && event.hour === hour
-  );
-  return event ? event.name : '';
+function deleteEvent() {
+  let cellId = eventDay.value + eventHour.value;
+  let cell = document.getElementById(cellId);
+  cell.innerHTML = "";
+  cell.style.backgroundColor = "white";
+  closePopup();
 }
 </script>
 
-
-
 <template>
-  <div class="container">
-    <div class="site-content">
-      <div class="popup-wrapper" v-if="CreatepopupVisible || EditpopupVisible">
-  <div v-if="CreatepopupVisible || EditpopupVisible" class="popup">
-    <button class="close-button" @click="closePopup">&#10006;</button>
-          <h2>{{ EditpopupVisible ? 'Edit Event' : 'Create Event' }}</h2>
-          <input type="text" v-model="eventName" :id="EditpopupVisible ? 'editEventName' : 'createEventName'"
-            placeholder="Event Name">
-          <div>
-            <label for="startHour">Start Hour:</label>
-            <input type="number" v-model="eventDetails.startHour" min="0" max="23" required>
-          </div>
-          <div>
-            <label for="endHour">End Hour:</label>
-            <input type="number" v-model="eventDetails.endHour" min="0" max="23" required>
-          </div>
+  <table class='table'>
+    <tr>
+      <th></th>
+      <th id="mon">Mon</th>
+      <th id="tue">Tue</th>
+      <th id="wed">Wed</th>
+      <th id="thu">Thu</th>
+      <th id="fri">Fri</th>
+      <th id="sat">Sat</th>
+      <th id="sun">Sun</th>
+    </tr>
+    <tr>
+      <th class="hour">07:00</th>
+      <td id="mon7" @click="clickCell('mon7')" @dblclick="editEvent('mon7')"></td>
+      <td id="tue7" @click="clickCell('tue7')"></td>
+      <td id="wed7" @click="clickCell('wed7')"></td>
+      <td id="thu7" @click="clickCell('thu7')"></td>
+      <td id="fri7" @click="clickCell('fri7')"></td>
+      <td id="sat7" @click="clickCell('sat7')"></td>
+      <td id="sun7" @click="clickCell('sun7')"></td>
+    </tr>
+    <tr>
+      <th class="hour">08:00</th>
+      <td id="mon8" @click="clickCell('mon8')"></td>
+      <td id="tue8" @click="clickCell('tue8')"></td>
+      <td id="wed8" @click="clickCell('wed8')"></td>
+      <td id="thu8" @click="clickCell('thu8')"></td>
+      <td id="fri8" @click="clickCell('fri8')"></td>
+      <td id="sat8" @click="clickCell('sat8')"></td>
+      <td id="sun8" @click="clickCell('sun8')"></td>
+    </tr>
+    <tr>
+      <th class="hour">09:00</th>
+      <td id="mon9" @click="clickCell('mon9')"></td>
+      <td id="tue9" @click="clickCell('tue9')"></td>
+      <td id="wed9" @click="clickCell('wed9')"></td>
+      <td id="thu9" @click="clickCell('thu9')"></td>
+      <td id="fri9" @click="clickCell('fri9')"></td>
+      <td id="sat9" @click="clickCell('sat9')"></td>
+      <td id="sun9" @click="clickCell('sun9')"></td>
+    </tr>
+    <tr>
+      <th class="hour">10:00</th>
+      <td id="mon10" @click="clickCell('mon10')"></td>
+      <td id="tue10" @click="clickCell('tue10')"></td>
+      <td id="wed10" @click="clickCell('wed10')"></td>
+      <td id="thu10" @click="clickCell('thu10')"></td>
+      <td id="fri10" @click="clickCell('fri10')"></td>
+      <td id="sat10" @click="clickCell('sat10')"></td>
+      <td id="sun10" @click="clickCell('sun10')"></td>
+    </tr>
+    <tr>
+      <th class="hour">11:00</th>
+      <td id="mon11" @click="clickCell('mon11')"></td>
+      <td id="tue11" @click="clickCell('tue11')"></td>
+      <td id="wed11" @click="clickCell('wed11')"></td>
+      <td id="thu11" @click="clickCell('thu11')"></td>
+      <td id="fri11" @click="clickCell('fri11')"></td>
+      <td id="sat11" @click="clickCell('sat11')"></td>
+      <td id="sun11" @click="clickCell('sun11')"></td>
+    </tr>
+    <tr>
+      <th class="hour">12:00</th>
+      <td id="mon12" @click="clickCell('mon12')"></td>
+      <td id="tue12" @click="clickCell('tue12')"></td>
+      <td id="wed12" @click="clickCell('wed12')"></td>
+      <td id="thu12" @click="clickCell('thu12')"></td>
+      <td id="fri12" @click="clickCell('fri12')"></td>
+      <td id="sat12" @click="clickCell('sat12')"></td>
+      <td id="sun12" @click="clickCell('sun12')"></td>
+    </tr>
+    <tr>
+      <th class="hour">13:00</th>
+      <td id="mon13" @click="clickCell('mon13')"></td>
+      <td id="tue13" @click="clickCell('tue13')"></td>
+      <td id="wed13" @click="clickCell('wed13')"></td>
+      <td id="thu13" @click="clickCell('thu13')"></td>
+      <td id="fri13" @click="clickCell('fri13')"></td>
+      <td id="sat13" @click="clickCell('sat13')"></td>
+      <td id="sun13" @click="clickCell('sun13')"></td>
+    </tr>
+    <tr>
+      <th class="hour">14:00</th>
+      <td id="mon14" @click="clickCell('mon14')"></td>
+      <td id="tue14" @click="clickCell('tue14')"></td>
+      <td id="wed14" @click="clickCell('wed14')"></td>
+      <td id="thu14" @click="clickCell('thu14')"></td>
+      <td id="fri14" @click="clickCell('fri14')"></td>
+      <td id="sat14" @click="clickCell('sat14')"></td>
+      <td id="sun14" @click="clickCell('sun14')"></td>
+    </tr>
+    <tr>
+      <th class="hour">15:00</th>
+      <td id="mon15" @click="clickCell('mon15')"></td>
+      <td id="tue15" @click="clickCell('tue15')"></td>
+      <td id="wed15" @click="clickCell('wed15')"></td>
+      <td id="thu15" @click="clickCell('thu15')"></td>
+      <td id="fri15" @click="clickCell('fri15')"></td>
+      <td id="sat15" @click="clickCell('sat15')"></td>
+      <td id="sun15" @click="clickCell('sun15')"></td>
+    </tr>
+    <tr>
+      <th class="hour">16:00</th>
+      <td id="mon16" @click="clickCell('mon16')"></td>
+      <td id="tue16" @click="clickCell('tue16')"></td>
+      <td id="wed16" @click="clickCell('wed16')"></td>
+      <td id="thu16" @click="clickCell('thu16')"></td>
+      <td id="fri16" @click="clickCell('fri16')"></td>
+      <td id="sat16" @click="clickCell('sat16')"></td>
+      <td id="sun16" @click="clickCell('sun16')"></td>
+    </tr>
+    <tr>
+      <th class="hour">17:00</th>
+      <td id="mon17" @click="clickCell('mon17')"></td>
+      <td id="tue17" @click="clickCell('tue17')"></td>
+      <td id="wed17" @click="clickCell('wed17')"></td>
+      <td id="thu17" @click="clickCell('thu17')"></td>
+      <td id="fri17" @click="clickCell('fri17')"></td>
+      <td id="sat17" @click="clickCell('sat17')"></td>
+      <td id="sun17" @click="clickCell('sun17')"></td>
+    </tr>
+    <tr>
+      <th class="hour">18:00</th>
+      <td id="mon18" @click="clickCell('mon18')"></td>
+      <td id="tue18" @click="clickCell('tue18')"></td>
+      <td id="wed18" @click="clickCell('wed18')"></td>
+      <td id="thu18" @click="clickCell('thu18')"></td>
+      <td id="fri18" @click="clickCell('fri18')"></td>
+      <td id="sat18" @click="clickCell('sat18')"></td>
+      <td id="sun18" @click="clickCell('sun18')"></td>
+    </tr>
+  </table>
 
-          <template v-if="EditpopupVisible">
-            <button @click="handleEvent('edit')">Save Changes</button>
-            <button @click="handleEvent('delete')">Delete</button>
-          </template>
-          <template v-else>
-            <button @click="handleEvent('create')">Save</button>
-          </template>
-        </div>
-      </div>
+  <div id="popupContainer" v-if="popupVisible" class="popup-content">
+    <span @click="closePopup()" class="close">&times;</span>
+    <h3>Create Event</h3>
 
-      <!-- Buttons for navigating to next and last weeks -->
-      <div class="week-navigation">
-        <button @click="moveToLastWeek">Last Week</button>
-        <button @click="moveToNextWeek">Next Week</button>
-      </div>
-      <!-- Button to toggle past events visibility -->
-      <div class="toggle-past-events">
-        <input type="checkbox" v-model="showPastEvents"> Show Past Events
-      </div>
-      <div class="table-wrapper">
-        <table class="fl-table">
-          <thead>
-            <tr>
-              <th></th>
-              <th v-for="day in days" :key="day.name">
-                {{ day.name }} {{ day.date.getDate() }}
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="hour in hours" :key="hour">
-              <th class="hour">{{ padZero(hour) }}:00</th>
-              <td v-for="day in days" :key="day + hour" @click="clickCell(day, hour)" :id="cellId(day.name, hour)"
-                :class="{ 'current-date': isCurrentDate(day.date) }">
-                {{ getEventName(day.name, hour) }}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+    <label for="eventName">Event Name:</label>
+    <input type="text" v-model="eventName" id="eventName" placeholder="Event Name" required>
+
+    <label for="eventDescription">Event Description:</label>
+    <textarea v-model="eventDescription" id="eventDescription" placeholder="Event Description"></textarea>
+
+    <label for="eventColor">Choose Color:<br></label>
+    <select id="colorDropdown">
+      <option value="red">Red</option>
+      <option value="green">Green</option>
+      <option value="blue">Blue</option>
+      <!-- Add more color options as needed -->
+    </select>
+
+    <!--<button class="createEventButton" @click= "createEvent()">Create Event</button>-->
+    <button class="createEventButton" @click= "createEvent()">Store Event</button>
+
+    <label>Make Persistent: </label>
+    <input type="checkbox" name="availableDays" value="mon">
   </div>
+
+<!--<script>
+import app from '../api/firebase';
+import { getFunctions, httpsCallable } from "firebase/functions";
+
+export default {
+    data() {
+        return {
+            handle: '',
+            comment: ''
+        }
+
+    },
+    methods: {
+        storeEvent() {
+            console.log(this.handle);
+            console.log(this.comment);
+            const functions = getFunctions(app);
+            console.log(app);
+            const postComment = httpsCallable(functions, 'postcomment');
+            postComment({ "handle": this.handle, "comment": this.comment })
+                .then((result) => {
+                    // Read result of the Cloud Function.
+                    /** @type {any} */
+                    console.log(result);
+                });
+        }
+    }
+  }
+
+</script>
+-->
+
+  <div id="popupEdit" v-if="EditpopupVisible" class="popup-content">
+    <span @click="closePopup()" class="close">&times;</span>
+    <h3>Edit Event</h3>
+
+    <label for="eventName">Event Name:</label>
+    <input type="text" v-model="eventName" id="eventName" placeholder="Event Name" required>
+
+    <label for="eventDescription">Event Description:</label>
+    <textarea v-model="eventDescription" id="eventDescription" placeholder="Event Description"></textarea>
+
+    <label for="eventColor">Change Color:<br></label>
+    <select id="colorDropdown">
+      <option value="pink">Red</option>
+      <option value="green">Green</option>
+      <option value="blue">Blue</option>
+      <!-- Add more color options as needed -->
+    </select>
+    <table>
+      <br>
+      <tr>
+        <th><button class="createEventButton" @click="createEvent()">Confirm Changes</button></th>
+      </tr>
+      <br>
+      <tr>
+        <th><button class="createEventButton" @click="deleteEvent()">Clear Event</button></th>
+      </tr>
+    </table>
+  </div>
+
+
+
+
+  <div id="popupCreate" v-if="CreatepopupVisible" class="popup-content">
+    <span @click="closePopup()" class="close">&times;</span>
+    <h3>Create Event</h3>
+
+    <label for="eventName">Event Name:</label>
+    <input type="text" v-model="eventName" id="eventName" placeholder="Event Name" required>
+
+    <label for="eventDescription">Event Description:</label>
+    <textarea v-model="eventDescription" id="eventDescription" placeholder="Event Description"></textarea>
+
+    <label for="startTime">Start Time:</label>
+    <input type="number" id="startTime" value="8" min="0" max="23"><br>
+
+    <label for="endTime">End Time:</label>
+    <input type="number" id="endTime" value="18" min="0" max="23"><br>
+
+    <label>Select Day:</label><br>
+    <select id="dayDropdown">
+      <option value="mon">Monday</option>
+      <option value="tue">Tuesday</option>
+      <option value="wed">Wednesday</option>
+      <option value="thu">Thursday</option>
+      <option value="fri">Friday</option>
+      <option value="sat">Saturday</option>
+      <option value="sun">Sunday</option>
+    </select><br>
+
+    <label for="eventColor">Select Color:<br></label>
+    <select id="colorDropdown">
+      <option value="red">Red</option>
+      <option value="green">Green</option>
+      <option value="blue">Blue</option>
+      <!-- Add more color options as needed -->
+    </select>
+
+    <button class="createEventButton" @click="createEvent()">Create Event</button>
+
+
+  </div>
+
+  <!--popup menu to make event-->
+  <button class="createEventButton" @click="createEventButton()"> Add to Schedule </button>
+
 </template>
-     
+
+<style scoped>
+</style>

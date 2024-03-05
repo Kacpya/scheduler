@@ -3,6 +3,7 @@
 </script>
 
 <template>
+ <h1>SCHEDULITE</h1>
 </template>
 
 <style scoped>
