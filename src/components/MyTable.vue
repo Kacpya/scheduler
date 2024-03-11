@@ -9,6 +9,8 @@ const EditpopupVisible = ref(false);
 const CreatepopupVisible = ref(false);
 const events = ref([]);
 const eventsMap = ref(new Map()); // Map to store events by date and time
+const createdEventCells = ref([]);
+
 
 const eventDetails = ref({ date: new Date(), startHour: '', endHour: '', duration: 1 });
 const eventName = ref('');
@@ -94,19 +96,23 @@ function createEvent(eventDetails) {
     console.log('Event already exists for this date and time');
     return;
   }
+  
+  // Loop through each hour within the duration and add the event to each hour
+  for (let i = 0; i < duration; i++) {
+    const hour = startHour + i;
+    const randomColor = getRandomColor(); // Generate random color
+    const event = {
+      date: new Date(date), // Create a new date object to avoid reference issues
+      startHour: hour,
+      endHour: hour,
+      name: eventNameValue,
+      color: randomColor,
+      duration: 1 // Duration is 1 for each hour within the event
+    };
 
-  const event = {
-    date: new Date(date), // Create a new date object to avoid reference issues
-    startHour,
-    endHour,
-    name: eventNameValue,
-    color: getRandomColor(),
-    duration: duration // Add duration to event object
-  };
-
-  // Add the event to the events array
-  events.value.push(event);
-  console.log('Event created:', event);
+    // Add the event to the events array
+    events.value.push(event);
+  }
 
   // Update the events map
   updateEventsMap();
@@ -166,10 +172,11 @@ function deleteEvent(eventDetails) {
 }
 
 function getRandomColor() {
-  const r = Math.floor(Math.random() * 256);
-  const g = Math.floor(Math.random() * 256);
-  const b = Math.floor(Math.random() * 256);
-  const color = '#' + r.toString(16) + g.toString(16) + b.toString(16);
+  const letters = '0123456789ABCDEF';
+  let color = '#';
+  for (let i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
   return color;
 }
 
@@ -226,6 +233,22 @@ function getEventByDateTime(dateTime) {
   const dateKey = `${dateTime.getFullYear()}-${dateTime.getMonth()}-${dateTime.getDate()}`;
   return eventsMap.value.get(getDateKey(dateTime))?.get(dateTime.getHours());
 }
+
+function isEventCell(date, hour) {
+  const event = getEventByDateTime(date);
+  return event && hour >= event.startHour && hour <= event.endHour;
+}
+
+function getEventBackgroundColor(date, hour) {
+  const event = getEventByDateTime(date);
+  return event && hour >= event.startHour && hour <= event.endHour ? event.color : '';
+}
+
+
+function hasEvent(date, hour) {
+  return eventsMap.value.has(getDateKey(date)) && eventsMap.value.get(getDateKey(date)).has(hour);
+}
+
 </script>
 
 <template>
@@ -273,15 +296,18 @@ function getEventByDateTime(dateTime) {
           <tbody>
             <!-- Table body -->
             <tr v-for="hour in hours" :key="hour">
-              <th class="hour">{{ padZero(hour) }}:00</th>
-              <td v-for="day in days" :key="day.name + hour" @click="clickCell(day, hour)" :id="cellId(day.name, hour)"
-                :class="{ 'current-date': isCurrentDate(day.date) }">
-                <!-- Display event name if exists for the current hour -->
-                <span v-if="eventsMap.has(getDateKey(day.date)) && eventsMap.get(getDateKey(day.date)).has(hour)">
-                  {{ eventsMap.get(getDateKey(day.date)).get(hour).name }}
-                </span>
-              </td>
-            </tr>
+            <th class="hour">{{ padZero(hour) }}:00</th>
+
+            
+            <td v-for="day in days" :key="day.name + hour" @click="clickCell(day, hour)" :id="cellId(day.name, hour)"
+              :class="{ 'current-date': isCurrentDate(day.date), 'event-cell': hasEvent(day.date, hour) }"
+              :style="{ backgroundColor: getEventBackgroundColor(day.date, hour) }">
+              <!-- Display event name if exists for the current hour -->
+              <span v-if="eventsMap.has(getDateKey(day.date)) && eventsMap.get(getDateKey(day.date)).has(hour)">
+                {{ eventsMap.get(getDateKey(day.date)).get(hour).name }}
+              </span>
+            </td>
+          </tr>
           </tbody>
         </table>
       </div>
