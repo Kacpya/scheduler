@@ -1,8 +1,9 @@
 <template>
     <header>
         <div class="logo">
-            <a href="https://imgbox.com/W498v2sL" target="_blank"><img src="https://thumbs2.imgbox.com/16/9f/W498v2sL_t.jpg" alt="Logo"/></a>
-                    
+            <a href="https://imgbox.com/W498v2sL" target="_blank"><img
+                    src="https://thumbs2.imgbox.com/16/9f/W498v2sL_t.jpg" alt="Logo" /></a>
+
         </div>
         <nav class="menu">
             <ul>
@@ -20,12 +21,12 @@
             </ul>
             <ul class="right-menu">
                 <li><a href="#" class="login-btn"><router-link to="/login">Log in</router-link></a></li>
-                <li><a href="#"><router-link to="/login">Sign up</router-link></a></li>
+                <li><a href="#"><router-link to="/register">Sign up</router-link></a></li>
             </ul>
         </nav>
     </header>
 </template>
-  
+
 <script>
 export default {
     name: 'Header',
