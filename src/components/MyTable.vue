@@ -11,6 +11,16 @@ const events = ref([]);
 const eventsMap = ref(new Map()); // Map to store events by date and time
 const createdEventCells = ref([]);
 
+class Event {
+  constructor(name, date, startHour, endHour, color) {
+    this.name = name;
+    this.date = date;
+    this.startHour = startHour;
+    this.endHour = endHour;
+    this.color = color;
+    this.duration = endHour - startHour + 1;
+  }
+}
 
 const eventDetails = ref({ date: new Date(), startHour: '', endHour: '', duration: 1 });
 const eventName = ref('');
@@ -96,22 +106,25 @@ function createEvent(eventDetails) {
     console.log('Event already exists for this date and time');
     return;
   }
-  
+
   // Loop through each hour within the duration and add the event to each hour
   for (let i = 0; i < duration; i++) {
     const hour = startHour + i;
     const randomColor = getRandomColor(); // Generate random color
-    const event = {
-      date: new Date(date), // Create a new date object to avoid reference issues
-      startHour: hour,
-      endHour: hour,
-      name: eventNameValue,
-      color: randomColor,
-      duration: 1 // Duration is 1 for each hour within the event
-    };
+    const event = new Event(eventNameValue, new Date(date), hour, hour, randomColor);
 
     // Add the event to the events array
     events.value.push(event);
+
+    // Mark the cells occupied by the event
+    const dayIndex = days.value.findIndex(day => getDateKey(day.date) === getDateKey(date));
+    if (dayIndex !== -1) {
+      const cell = document.getElementById(cellId(days.value[dayIndex], hour));
+      if (cell) {
+        cell.classList.add('event-cell');
+        cell.style.backgroundColor = randomColor;
+      }
+    }
   }
 
   // Update the events map
@@ -123,6 +136,9 @@ function createEvent(eventDetails) {
   // Clear event name after creating event
   eventName.value = '';
 }
+
+
+
 
 function editEvent() {
   const { date, startHour, endHour, duration } = eventDetails.value;
@@ -260,14 +276,14 @@ function hasEvent(date, hour) {
           <h2>{{ EditpopupVisible ? 'Edit Event' : 'Create Event' }}</h2>
           <input type="text" v-model="eventName" :id="EditpopupVisible ? 'editEventName' : 'createEventName'"
             placeholder="Event Name">
-          <div>
-            <label for="startHour">Start Hour:</label>
-            <input type="number" v-model="eventDetails.startHour" min="0" max="23" required>
-          </div>
-          <div>
-            <label for="endHour">End Hour:</label>
-            <input type="number" v-model="eventDetails.endHour" min="0" max="23" required>
-          </div>
+            <div>
+  <label for="startHour">Start Hour:</label>
+  <input type="number" v-model="eventDetails.startHour" min="0" max="23" required id="startHour">
+</div>
+<div>
+  <label for="endHour">End Hour:</label>
+  <input type="number" v-model="eventDetails.endHour" min="0" max="23" required id="endHour">
+</div>
 
           <template v-if="EditpopupVisible">
             <button @click="handleEvent('edit')">Save Changes</button>
