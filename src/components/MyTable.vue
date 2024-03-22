@@ -12,14 +12,14 @@ const eventsMap = ref(new Map()); // Map to store events by date and time
 const createdEventCells = ref([]);
 
 class Event {
-  constructor(name, date, startHour, endHour, color) {
+  constructor(name, date, startHour, endHour, color, duration, link) {
     this.name = name;
     this.date = date;
     this.startHour = startHour;
     this.endHour = endHour;
     this.color = color;
-    this.duration = endHour - startHour + 1;
-    this.cells = []; // Array to store related cells
+    this.duration = duration;
+    this.link = link;
   }
 }
 
@@ -67,14 +67,16 @@ function clickCell(day, hour) {
 
   const event = getEventByDateTime(date);
 
-  if (event) {
+  if (event) { //if event exists
     // Set event details
     eventDetails.value = {
       date: event.date,
       startHour: event.startHour,
       endHour: event.endHour,
-      duration: event.duration
+      duration: event.duration,
+      link: event.link
     };
+
     eventName.value = event.name;
     EditpopupVisible.value = true;
   } else {
@@ -98,8 +100,14 @@ function handleEvent(action) {
 
 function createEvent(eventDetails) {
   const { date, startHour, endHour } = eventDetails;
-  const eventNameValue = eventName.value;
+  const eventname = eventName.value;
+  let eventNameValue = eventname;
   const duration = endHour - startHour + 1; // Calculate duration
+
+  if (eventNameValue == "") {
+    alert("INPUT AN EVENT NAME");
+    return;
+  }
 
   const existingEvent = getEventByDateTime(date); // Check if an event already exists for the specified date
 
@@ -108,31 +116,39 @@ function createEvent(eventDetails) {
     return;
   }
 
-  // Create a new event
   const randomColor = getRandomColor(); // Generate random color
-  const event = new Event(eventNameValue, new Date(date), startHour, endHour, randomColor);
 
+  const eventColor = randomColor; //for storing event color
+  
   // Loop through each hour within the duration and add the event to each hour
   for (let i = 0; i < duration; i++) {
     const hour = startHour + i;
-    const cellIdToAdd = cellId(date, hour);
+    
+    const event = new Event(eventNameValue, new Date(date), hour, hour, randomColor, duration, i+1);
+    console.log("rand col: " + event.color);
+    eventNameValue = "";
 
-    // Store the event object itself instead of the cell ID
-    events.value.push(event);
+
 
     // Mark the cells occupied by the event
     const dayIndex = days.value.findIndex(day => getDateKey(day.date) === getDateKey(date));
+    const cell = document.getElementById(cellId(days.value[dayIndex], hour));
+
+    // Add the event to the events array
+    events.value.push(event);
+    
     if (dayIndex !== -1) {
-      const cell = document.getElementById(cellId(days.value[dayIndex], hour));
       if (cell) {
         cell.classList.add('event-cell');
-        cell.style.backgroundColor = randomColor;
-
-        // Store related cell in the event
-        event.cells.push(cell);
-      }
+        //cell.style.backgroundColor = randomColor;
     }
+   }
   }
+  
+
+  //console.log("3 " + eventName.value, startHour, endHour, eventColor, date.toString());
+
+  postEvent(eventName.value, startHour, endHour, eventColor, date.toDateString());
 
   // Update the events map
   updateEventsMap();
@@ -144,48 +160,22 @@ function createEvent(eventDetails) {
   eventName.value = '';
 }
 
+
+
+
 function editEvent() {
   const { date, startHour, endHour, duration } = eventDetails.value;
 
-  console.log('Edit Event Details:', { date, startHour, endHour, duration });
+  const event = getEventByDateTime(date);
 
-  const eventToUpdate = getEventByDateTime(date);
+  if (event) {
+    // Update existing event with new details
+    event.startHour = startHour;
+    event.endHour = startHour + duration - 1; // Adjust end hour based on duration
+    event.name = eventName.value; // Update event name
 
-  if (eventToUpdate) {
-    console.log('Event to Update:', eventToUpdate);
-
-    // Remove the existing event from events array and events map
-    deleteEvent(eventToUpdate);
-
-    console.log('Event Deleted:', eventToUpdate);
-
-    // Create a new event with updated details
-    const updatedEvent = new Event(eventName.value, new Date(date), parseInt(startHour), parseInt(endHour), eventToUpdate.color);
-
-    console.log('New Event:', updatedEvent);
-
-    // Loop through each hour within the duration and add the event to each hour
-    for (let i = 0; i < duration; i++) {
-      const hour = parseInt(startHour) + i;
-      const cellIdToAdd = cellId(date, hour);
-      // Mark the cells occupied by the event
-      const dayIndex = days.value.findIndex(day => getDateKey(day.date) === getDateKey(date));
-      if (dayIndex !== -1) {
-        const cell = document.getElementById(cellId(days.value[dayIndex], hour));
-        if (cell) {
-          cell.classList.add('event-cell');
-          cell.style.backgroundColor = updatedEvent.color;
-          // Store related cell in the event
-          updatedEvent.cells.push(cell);
-        }
-      }
-    }
-
-    // Add the updated event back to events array and events map
-    events.value.push(updatedEvent);
+    // Update the events map
     updateEventsMap();
-
-    console.log('Event Updated:', updatedEvent);
 
     // Close the edit popup
     EditpopupVisible.value = false;
@@ -194,45 +184,36 @@ function editEvent() {
 
 function deleteEvent(eventDetails) {
   const { date, startHour, duration } = eventDetails;
+  const startDateTime = new Date(date);
+  startDateTime.setHours(startHour);
+  
+  alert(duration)
+  for (let i = 0; i < duration; i++) {
+    const currentDateTime = new Date(startDateTime);
+    currentDateTime.setHours(startDateTime.getHours() + i);
 
-  const eventToDelete = getEventByDateTime(date); // Find the event using its date
-
-  if (eventToDelete) {
-    // Remove the event from the events array
-    events.value = events.value.filter(event =>
-      !(event.date.getTime() === eventToDelete.date.getTime() &&
-        event.startHour === eventToDelete.startHour)
+    const eventIndex = events.value.findIndex(event =>
+      event.date.getTime() === currentDateTime.getTime() &&
+      event.startHour === startHour
     );
 
-    // Remove the event from the events map
-    const dateKey = getDateKey(date);
-    for (let i = 0; i < duration; i++) {
-      if (eventsMap.value.has(dateKey) && eventsMap.value.get(dateKey).has(startHour + i)) {
-        eventsMap.value.get(dateKey).delete(startHour + i);
-
-        // If there are no more events for this date, delete the date key
-        if (eventsMap.value.get(dateKey).size === 0) {
-          eventsMap.value.delete(dateKey);
-        }
-      }
-
-      // Clear the related cell
-      const cellIdToDelete = cellId(getDateKey(date), startHour + i);
-      const cellToDelete = document.getElementById(cellIdToDelete);
-      if (cellToDelete) {
-        cellToDelete.classList.remove('event-cell');
-        cellToDelete.style.backgroundColor = ''; // Reset background color
-      }
+    if (eventIndex !== -1) {
+      events.value.splice(eventIndex, 1);
     }
 
-    // Close the edit popup
-    EditpopupVisible.value = false;
+    const dateKey = getDateKey(currentDateTime);
+    if (eventsMap.value.has(dateKey) && eventsMap.value.get(dateKey).has(startHour + i)) {
+      eventsMap.value.get(dateKey).delete(startHour + i);
+    }
   }
+
+  // Close the edit popup
+  EditpopupVisible.value = false;
 }
 
 function getRandomColor() {
   const letters = '0123456789ABCDEF';
-  let color = '#';
+  let color = "purple";
   for (let i = 0; i < 6; i++) {
     color += letters[Math.floor(Math.random() * 16)];
   }
@@ -280,21 +261,27 @@ function updateEventsMap() {
     if (!eventsMap.value.has(dateKey)) {
       eventsMap.value.set(dateKey, new Map());
     }
-    for (let i = event.startHour; i <= event.endHour; i++) {
-      eventsMap.value.get(dateKey).set(i, event);
-    }
+    eventsMap.value.get(dateKey).set(event.startHour, event);
   });
 }
 
 function getDateKey(date) {
-  if (!date || !(date instanceof Date) || isNaN(date.getTime())) {
-    console.error('Invalid date:', date);
-    return '';
-  }
   return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
 }
 
-function getEventByDateTime(dateTime) {
+function getEventByDateTime(dateTime) { //returns starting time of event
+  const dateKey = `${dateTime.getFullYear()}-${dateTime.getMonth()}-${dateTime.getDate()}`;
+
+  const event = eventsMap.value.get(getDateKey(dateTime))?.get(dateTime.getHours());
+  if (event != null) {
+    if (event.link > 1) {
+      return eventsMap.value.get(getDateKey(dateTime))?.get((dateTime.getHours() - event.link + 1));
+    }
+  }
+  return event;
+}
+
+function getEventByDateTime2(dateTime) { //returns any cell
   const dateKey = `${dateTime.getFullYear()}-${dateTime.getMonth()}-${dateTime.getDate()}`;
   return eventsMap.value.get(getDateKey(dateTime))?.get(dateTime.getHours());
 }
@@ -304,11 +291,125 @@ function isEventCell(date, hour) {
   return event && hour >= event.startHour && hour <= event.endHour;
 }
 
+function getEventBackgroundColor(date, hour) {
+  const event = getEventByDateTime(date);
+  return event && hour >= event.startHour && hour <= event.endHour ? event.color : '';
+}
+
 
 function hasEvent(date, hour) {
   return eventsMap.value.has(getDateKey(date)) && eventsMap.value.get(getDateKey(date)).has(hour);
 }
 
+/**
+function handleHover(date, hour) {
+  const event = getEventByDateTime(date);
+}
+ */
+
+import app from '../api/firebase';
+import { getFunctions, httpsCallable, connectFunctionsEmulator } from "firebase/functions";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { store } from '../store/store';
+
+
+
+const eventNameForStoring = ref('');
+const startHour = ref('');
+const endHour = ref('');
+const color = ref('');
+const date = ref('');
+const user = ref(null);
+
+
+const auth = getAuth(app);
+onAuthStateChanged(auth, (curUser) => {
+  if (curUser) {
+    console.log("User", user);
+    user.value = curUser; // set the user object to the user prop
+    // User is signed in
+  } else {
+    console.log("No user found")
+    // User is not signed in
+  }
+});
+// this.getComments();
+
+const functions = getFunctions(app, 'europe-west1'); //specify region for cloud functions
+
+const postEvent = (eventName, startHour, endHour, color, date) => {
+
+  const functions = getFunctions(app);
+  /*if (window.location.hostname === 'localhost') // Check if working locally            
+      connectFunctionsEmulator(functions, "localhost", 5001);
+  */
+  console.log("2 " + eventName, startHour, endHour, color, date);
+
+  const eventString = eventName + "," + startHour + "," + endHour + "," + color + "," + date; 
+
+  const postEvent = httpsCallable(functions, 'postuserschedule');
+
+  try {
+  postEvent({ "event": eventString })
+    .then((result) => {
+      console.log(result);
+      // Read result of the Cloud Function.
+      /** @type {any} */
+      if (getEvents) {
+        getEvents(); // Call getEvents if it's provided
+      }
+      console.log(result);
+      //loader.hide();
+    });
+  }
+  catch (error) {
+    console.error("Error posting event:", error);
+  }
+};
+
+const getEvents = () => {
+  const functions = getFunctions(app);
+  const getEvents = httpsCallable(functions, 'getevents');
+  //let loader = this.$loading.show({
+    // Optional parameters  
+    //container: this.$refs.container,
+    //canCancel: false
+  //});
+  try {
+  getEvents()
+  .then((result) => {
+    // Read result of the Cloud Function.
+    // /** @type {any} */
+    console.log(result);
+    loader.hide();
+    if (result.data != "No data in database") {
+      this.eventsArray = result.data;
+      console.log("eventsArray: " + eventsArray);
+    } else {
+      this.eventsArray = [];
+      console.log("eventsArray: " + eventsArray);
+    }
+  });
+  } catch (error) {
+    console.error("Error getting events:", error);
+  }
+};
+
+const deleteComment = (id) => {
+  const functions = getFunctions(app);
+  const deleteComment = httpsCallable(functions, 'deleteusercomment');
+  let loader = this.$loading.show({
+    // Optional parameters  
+    container: this.$refs.container,
+    canCancel: false
+  });
+  deleteComment({ id: id }).then((result) => {
+    console.log(result);
+    loader.hide();
+    if (result.data == "Document successfully deleted")
+      this.getComments() // To refresh the client
+  });
+};
 </script>
 
 <template>
@@ -354,19 +455,25 @@ function hasEvent(date, hour) {
             </tr>
           </thead>
           <tbody>
+            
             <!-- Table body -->
             <tr v-for="hour in hours" :key="hour">
               <th class="hour">{{ padZero(hour) }}:00</th>
-              <td v-for="(day, dayIndex) in days" :key="day.name + hour" @click="clickCell(day, hour)"
-                :id="cellId(day.name, hour)"
-                :class="{ 'current-date': isCurrentDate(day.date), 'event-cell': hasEvent(day.date, hour) }">
-                <!-- Display event name only in the first cell of the event -->
-                <span
-                  v-if="eventsMap.has(getDateKey(day.date)) && eventsMap.get(getDateKey(day.date)).has(hour) && eventsMap.get(getDateKey(day.date)).get(hour).startHour === hour">
+
+
+              <td v-for="day in days" :key="day.name + hour" @click="clickCell(day, hour)" :id="cellId(day.name, hour)"
+                :class="{ 'current-date': isCurrentDate(day.date), 'event-cell': hasEvent(day.date, hour) }"
+                :style="{ backgroundColor: getEventBackgroundColor(day.date, hour) }">
+                
+                <!-- @mouseover="hoveredCell = `${day.name}-${hour}`; handleHover(day, hour)" @mouseout="hoveredCell = null"> -->
+                
+                <!-- Display event name if exists for the current hour -->
+                <span v-if="eventsMap.has(getDateKey(day.date)) && eventsMap.get(getDateKey(day.date)).has(hour)">
                   {{ eventsMap.get(getDateKey(day.date)).get(hour).name }}
                 </span>
               </td>
             </tr>
+            
           </tbody>
         </table>
       </div>

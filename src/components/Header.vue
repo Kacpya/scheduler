@@ -1,9 +1,8 @@
 <template>
     <header>
         <div class="logo">
-            <a href="https://imgbox.com/W498v2sL" target="_blank"><img
-                    src="https://thumbs2.imgbox.com/16/9f/W498v2sL_t.jpg" alt="Logo" /></a>
-
+            <a href="https://imgbox.com/0bBpBZDc" target="_blank"><img src="https://thumbs2.imgbox.com/1a/8b/0bBpBZDc_t.png"
+                    alt="Logo" /></a>
         </div>
         <nav class="menu">
             <ul>
@@ -26,7 +25,7 @@
         </nav>
     </header>
 </template>
-
+  
 <script>
 export default {
     name: 'Header',
