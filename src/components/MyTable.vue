@@ -19,6 +19,7 @@ class Event {
     this.endHour = endHour;
     this.color = color;
     this.duration = endHour - startHour + 1;
+    this.cells = []; // Array to store related cells
   }
 }
 
@@ -107,13 +108,16 @@ function createEvent(eventDetails) {
     return;
   }
 
+  // Create a new event
+  const randomColor = getRandomColor(); // Generate random color
+  const event = new Event(eventNameValue, new Date(date), startHour, endHour, randomColor);
+
   // Loop through each hour within the duration and add the event to each hour
   for (let i = 0; i < duration; i++) {
     const hour = startHour + i;
-    const randomColor = getRandomColor(); // Generate random color
-    const event = new Event(eventNameValue, new Date(date), hour, hour, randomColor);
+    const cellIdToAdd = cellId(date, hour);
 
-    // Add the event to the events array
+    // Store the event object itself instead of the cell ID
     events.value.push(event);
 
     // Mark the cells occupied by the event
@@ -123,6 +127,9 @@ function createEvent(eventDetails) {
       if (cell) {
         cell.classList.add('event-cell');
         cell.style.backgroundColor = randomColor;
+
+        // Store related cell in the event
+        event.cells.push(cell);
       }
     }
   }
@@ -137,22 +144,48 @@ function createEvent(eventDetails) {
   eventName.value = '';
 }
 
-
-
-
 function editEvent() {
   const { date, startHour, endHour, duration } = eventDetails.value;
 
-  const event = getEventByDateTime(date);
+  console.log('Edit Event Details:', { date, startHour, endHour, duration });
 
-  if (event) {
-    // Update existing event with new details
-    event.startHour = startHour;
-    event.endHour = startHour + duration - 1; // Adjust end hour based on duration
-    event.name = eventName.value; // Update event name
+  const eventToUpdate = getEventByDateTime(date);
 
-    // Update the events map
+  if (eventToUpdate) {
+    console.log('Event to Update:', eventToUpdate);
+
+    // Remove the existing event from events array and events map
+    deleteEvent(eventToUpdate);
+
+    console.log('Event Deleted:', eventToUpdate);
+
+    // Create a new event with updated details
+    const updatedEvent = new Event(eventName.value, new Date(date), parseInt(startHour), parseInt(endHour), eventToUpdate.color);
+
+    console.log('New Event:', updatedEvent);
+
+    // Loop through each hour within the duration and add the event to each hour
+    for (let i = 0; i < duration; i++) {
+      const hour = parseInt(startHour) + i;
+      const cellIdToAdd = cellId(date, hour);
+      // Mark the cells occupied by the event
+      const dayIndex = days.value.findIndex(day => getDateKey(day.date) === getDateKey(date));
+      if (dayIndex !== -1) {
+        const cell = document.getElementById(cellId(days.value[dayIndex], hour));
+        if (cell) {
+          cell.classList.add('event-cell');
+          cell.style.backgroundColor = updatedEvent.color;
+          // Store related cell in the event
+          updatedEvent.cells.push(cell);
+        }
+      }
+    }
+
+    // Add the updated event back to events array and events map
+    events.value.push(updatedEvent);
     updateEventsMap();
+
+    console.log('Event Updated:', updatedEvent);
 
     // Close the edit popup
     EditpopupVisible.value = false;
@@ -161,30 +194,40 @@ function editEvent() {
 
 function deleteEvent(eventDetails) {
   const { date, startHour, duration } = eventDetails;
-  const startDateTime = new Date(date);
-  startDateTime.setHours(startHour);
 
-  for (let i = 0; i < duration; i++) {
-    const currentDateTime = new Date(startDateTime);
-    currentDateTime.setHours(startDateTime.getHours() + i);
+  const eventToDelete = getEventByDateTime(date); // Find the event using its date
 
-    const eventIndex = events.value.findIndex(event =>
-      event.date.getTime() === currentDateTime.getTime() &&
-      event.startHour === startHour
+  if (eventToDelete) {
+    // Remove the event from the events array
+    events.value = events.value.filter(event =>
+      !(event.date.getTime() === eventToDelete.date.getTime() &&
+        event.startHour === eventToDelete.startHour)
     );
 
-    if (eventIndex !== -1) {
-      events.value.splice(eventIndex, 1);
+    // Remove the event from the events map
+    const dateKey = getDateKey(date);
+    for (let i = 0; i < duration; i++) {
+      if (eventsMap.value.has(dateKey) && eventsMap.value.get(dateKey).has(startHour + i)) {
+        eventsMap.value.get(dateKey).delete(startHour + i);
+
+        // If there are no more events for this date, delete the date key
+        if (eventsMap.value.get(dateKey).size === 0) {
+          eventsMap.value.delete(dateKey);
+        }
+      }
+
+      // Clear the related cell
+      const cellIdToDelete = cellId(getDateKey(date), startHour + i);
+      const cellToDelete = document.getElementById(cellIdToDelete);
+      if (cellToDelete) {
+        cellToDelete.classList.remove('event-cell');
+        cellToDelete.style.backgroundColor = ''; // Reset background color
+      }
     }
 
-    const dateKey = getDateKey(currentDateTime);
-    if (eventsMap.value.has(dateKey) && eventsMap.value.get(dateKey).has(startHour + i)) {
-      eventsMap.value.get(dateKey).delete(startHour + i);
-    }
+    // Close the edit popup
+    EditpopupVisible.value = false;
   }
-
-  // Close the edit popup
-  EditpopupVisible.value = false;
 }
 
 function getRandomColor() {
@@ -237,11 +280,17 @@ function updateEventsMap() {
     if (!eventsMap.value.has(dateKey)) {
       eventsMap.value.set(dateKey, new Map());
     }
-    eventsMap.value.get(dateKey).set(event.startHour, event);
+    for (let i = event.startHour; i <= event.endHour; i++) {
+      eventsMap.value.get(dateKey).set(i, event);
+    }
   });
 }
 
 function getDateKey(date) {
+  if (!date || !(date instanceof Date) || isNaN(date.getTime())) {
+    console.error('Invalid date:', date);
+    return '';
+  }
   return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
 }
 
@@ -253,11 +302,6 @@ function getEventByDateTime(dateTime) {
 function isEventCell(date, hour) {
   const event = getEventByDateTime(date);
   return event && hour >= event.startHour && hour <= event.endHour;
-}
-
-function getEventBackgroundColor(date, hour) {
-  const event = getEventByDateTime(date);
-  return event && hour >= event.startHour && hour <= event.endHour ? event.color : '';
 }
 
 
@@ -276,14 +320,14 @@ function hasEvent(date, hour) {
           <h2>{{ EditpopupVisible ? 'Edit Event' : 'Create Event' }}</h2>
           <input type="text" v-model="eventName" :id="EditpopupVisible ? 'editEventName' : 'createEventName'"
             placeholder="Event Name">
-            <div>
-  <label for="startHour">Start Hour:</label>
-  <input type="number" v-model="eventDetails.startHour" min="0" max="23" required id="startHour">
-</div>
-<div>
-  <label for="endHour">End Hour:</label>
-  <input type="number" v-model="eventDetails.endHour" min="0" max="23" required id="endHour">
-</div>
+          <div>
+            <label for="startHour">Start Hour:</label>
+            <input type="number" v-model="eventDetails.startHour" min="0" max="23" required id="startHour">
+          </div>
+          <div>
+            <label for="endHour">End Hour:</label>
+            <input type="number" v-model="eventDetails.endHour" min="0" max="23" required id="endHour">
+          </div>
 
           <template v-if="EditpopupVisible">
             <button @click="handleEvent('edit')">Save Changes</button>
@@ -312,18 +356,17 @@ function hasEvent(date, hour) {
           <tbody>
             <!-- Table body -->
             <tr v-for="hour in hours" :key="hour">
-            <th class="hour">{{ padZero(hour) }}:00</th>
-
-            
-            <td v-for="day in days" :key="day.name + hour" @click="clickCell(day, hour)" :id="cellId(day.name, hour)"
-              :class="{ 'current-date': isCurrentDate(day.date), 'event-cell': hasEvent(day.date, hour) }"
-              :style="{ backgroundColor: getEventBackgroundColor(day.date, hour) }">
-              <!-- Display event name if exists for the current hour -->
-              <span v-if="eventsMap.has(getDateKey(day.date)) && eventsMap.get(getDateKey(day.date)).has(hour)">
-                {{ eventsMap.get(getDateKey(day.date)).get(hour).name }}
-              </span>
-            </td>
-          </tr>
+              <th class="hour">{{ padZero(hour) }}:00</th>
+              <td v-for="(day, dayIndex) in days" :key="day.name + hour" @click="clickCell(day, hour)"
+                :id="cellId(day.name, hour)"
+                :class="{ 'current-date': isCurrentDate(day.date), 'event-cell': hasEvent(day.date, hour) }">
+                <!-- Display event name only in the first cell of the event -->
+                <span
+                  v-if="eventsMap.has(getDateKey(day.date)) && eventsMap.get(getDateKey(day.date)).has(hour) && eventsMap.get(getDateKey(day.date)).get(hour).startHour === hour">
+                  {{ eventsMap.get(getDateKey(day.date)).get(hour).name }}
+                </span>
+              </td>
+            </tr>
           </tbody>
         </table>
       </div>
