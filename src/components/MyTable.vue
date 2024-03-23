@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 
 const props = defineProps({
   cellId: String,
@@ -32,6 +32,7 @@ const days = ref([]);
 const hours = Array.from({ length: 24 }, (_, i) => i);
 const showPastEvents = ref(false);
 
+let eventsArray = [];
 // Initialize days with the current week
 updateDays();
 
@@ -98,6 +99,7 @@ function handleEvent(action) {
 
 function createEvent(eventDetails) {
   const { date, startHour, endHour } = eventDetails;
+  console.log("date", date);
   const eventNameValue = eventName.value;
   const duration = endHour - startHour + 1; // Calculate duration
 
@@ -110,14 +112,17 @@ function createEvent(eventDetails) {
 
   // Create a new event
   const randomColor = getRandomColor(); // Generate random color
+
+  const eventColor = randomColor; //for storing event color
+
+
   const event = new Event(eventNameValue, new Date(date), startHour, endHour, randomColor);
 
   // Loop through each hour within the duration and add the event to each hour
   for (let i = 0; i < duration; i++) {
     const hour = startHour + i;
-    const cellIdToAdd = cellId(date, hour);
-
-    // Store the event object itself instead of the cell ID
+   
+    // store the event object
     events.value.push(event);
 
     // Mark the cells occupied by the event
@@ -133,6 +138,8 @@ function createEvent(eventDetails) {
       }
     }
   }
+
+  postEvent(eventName.value, startHour, endHour, eventColor, date.toDateString());
 
   // Update the events map
   updateEventsMap();
@@ -194,15 +201,16 @@ function editEvent() {
 
 function deleteEvent(eventDetails) {
   const { date, startHour, duration } = eventDetails;
-
-  const eventToDelete = getEventByDateTime(date); // Find the event using its date
-
+  const eventToDelete = getEventByDateTime(date); //find the event using its date
+  
+  
   if (eventToDelete) {
     // Remove the event from the events array
     events.value = events.value.filter(event =>
       !(event.date.getTime() === eventToDelete.date.getTime() &&
         event.startHour === eventToDelete.startHour)
     );
+
 
     // Remove the event from the events map
     const dateKey = getDateKey(date);
@@ -225,8 +233,36 @@ function deleteEvent(eventDetails) {
       }
     }
 
+    console.log("eventToDelete", eventToDelete);
+    findEventForDeletionInDatabase(eventToDelete);
+    
     // Close the edit popup
     EditpopupVisible.value = false;
+
+  }
+}
+
+function findEventForDeletionInDatabase(eventToDelete) {
+  if (eventToDelete != null) {
+    const auth = getAuth(app);
+    const currentUser = auth.currentUser;
+    const currentUserID = currentUser.uid;
+
+    let eventToDeleteDate = eventToDelete.date.toDateString();
+
+    for (var i = 0; i < eventsArray.length; i++) {
+      if (currentUserID == eventsArray[i].data.uid) { //if current users event
+
+        //database information
+        const eventDetailsSplit = eventsArray[i].data.event.split(',');
+        const [eventName, startHour, endHour, eventColor, dateString] = eventDetailsSplit;
+
+        if (dateString == eventToDeleteDate && startHour == eventToDelete.startHour && endHour == eventToDelete.endHour) { //find event with same date and time
+          console.log(eventsArray[i].id);
+          deleteEventFromDatabase("eventsArray[i].data", eventsArray[i].id);
+        }
+      }
+    }
   }
 }
 
@@ -304,11 +340,199 @@ function isEventCell(date, hour) {
   return event && hour >= event.startHour && hour <= event.endHour;
 }
 
-
 function hasEvent(date, hour) {
   return eventsMap.value.has(getDateKey(date)) && eventsMap.value.get(getDateKey(date)).has(hour);
 }
 
+function displayDatabaseEvents(eventsArray) {
+  events.value = []; //clear events
+  generateUsersEventsFromDatabase(eventsArray); //generate events from database
+}
+
+
+
+function generateUsersEventsFromDatabase(eventsArray) {
+
+  const auth = getAuth(app);
+  const currentUser = auth.currentUser;
+  const currentUserID = currentUser.uid;
+  console.log("currentUser.uid ", currentUser.uid)
+
+  //create user events from database
+  for (var i = 0; i < eventsArray.length; i++) {
+    if (currentUserID == eventsArray[i].data.uid) { //if current users event
+      //console.log("eventsArray[i].data.uid ", eventsArray[i].data.uid);
+      //console.log("eventsArray[i].data.event ", eventsArray[i].data.event);
+      // split event string into its smaller components
+      const eventDetailsSplit = eventsArray[i].data.event.split(',');
+
+      const [eventName, startHour, endHour, eventColor, dateString] = eventDetailsSplit;
+      const startHourInt = parseInt(startHour);
+      const endHourInt = parseInt(endHour);
+      const date = new Date(dateString);
+      
+      const event = new Event(eventName, date, startHourInt, endHourInt, eventColor);
+
+      /**
+        console.log("Event Name:", eventName);
+        console.log("Start Hour:", startHour);
+        console.log("End Hour:", endHour);
+        console.log("Color:", eventColor);
+        console.log("Date:", date);
+       */
+
+      let duration = endHour - startHour;
+      if (duration == 0) {
+        duration = 1;
+      }
+      // Loop through each hour within the duration and add the event to each hour
+      for (let i = 0; i < duration; i++) {
+        const hour = startHour + i;
+        const cellIdToAdd = cellId(date, hour);
+
+        // store the event object
+        events.value.push(event);
+
+        // Mark the cells occupied by the event
+        const dayIndex = days.value.findIndex(day => getDateKey(day.date) === getDateKey(date));
+        if (dayIndex !== -1) {
+          const cell = document.getElementById(cellId(days.value[dayIndex], hour));
+          if (cell) {
+            cell.classList.add('event-cell');
+            cell.style.backgroundColor = randomColor;
+
+            // Store related cell in the event
+            event.cells.push(cell);
+          }
+        }
+      }
+      //update the events map
+      updateEventsMap();
+    }
+  }
+  
+
+  // Clear event name after creating event
+  eventName.value = '';
+}
+
+
+import app from '../api/firebase';
+import { getFunctions, httpsCallable, connectFunctionsEmulator } from "firebase/functions";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { store } from '../store/store';
+
+
+
+const eventNameForStoring = ref('');
+const startHour = ref('');
+const endHour = ref('');
+const color = ref('');
+const date = ref('');
+const user = ref(null);
+
+
+const auth = getAuth(app);
+onAuthStateChanged(auth, (curUser) => {
+  if (curUser) {
+    console.log("User", user);
+    user.value = curUser; // set the user object to the user prop
+    // User is signed in
+  } else {
+    console.log("No user found")
+    // User is not signed in
+  }
+});
+// this.getComments();
+
+const functions = getFunctions(app, 'us-central1'); //specify region for cloud functions
+
+const postEvent = (eventName, startHour, endHour, color, date) => {
+
+  const functions = getFunctions(app);
+  /*if (window.location.hostname === 'localhost') // Check if working locally            
+      connectFunctionsEmulator(functions, "localhost", 5001);
+  */
+  console.log("2 " + eventName, startHour, endHour, color, date);
+
+  const eventString = eventName + "," + startHour + "," + endHour + "," + color + "," + date;
+
+  const postEvent = httpsCallable(functions, 'postuserschedule');
+
+  try {
+    postEvent({ "event": eventString })
+      .then((result) => {
+        console.log(result);
+        // Read result of the Cloud Function.
+        /** @type {any} */
+        //if (getEvents) {
+          //getEvents(); // Call getEvents if it's provided
+        //}
+        console.log(result);
+        //loader.hide();
+      });
+  }
+  catch (error) {
+    console.error("Error posting event:", error);
+  }
+};
+
+const getEvents = () => {
+  const functions = getFunctions(app);
+  const getEvents = httpsCallable(functions, 'getevents');
+
+
+  //let loader = this.$loading.show({
+  // Optional parameters  
+  //container: this.$refs.container,
+  //canCancel: false
+  //});
+  try {
+    getEvents()
+      .then((result) => {
+        // Read result of the Cloud Function.
+        // /** @type {any} */
+        console.log("getevent result: ");
+        console.log(result);
+        //loader.hide();
+        if (result.data != "No data in database") {
+          eventsArray = result.data;
+          generateUsersEventsFromDatabase(eventsArray);
+          console.log("eventsArray1: ");
+          console.log(eventsArray);
+        } else {
+          eventsArray = [];
+          console.log("eventsArray2: ");
+          console.log(eventsArray);
+        }
+      });
+  } catch (error) {
+    console.error("Error getting events:", error);
+  }
+};
+
+const deleteEventFromDatabase = (id) => {
+  const functions = getFunctions(app);
+  const deleteEvent = httpsCallable(functions, 'deleteuserevent');
+  
+  //let loader = this.$loading.show({
+  // Optional parameters  
+  //container: this.$refs.container,
+  //canCancel: false
+  //});
+  deleteEvent({ id: id }).then((result) => {
+    console.log(result);
+    //loader.hide();
+    if (result.data == "Document successfully deleted")
+      this.getComments() // To refresh the client
+  });
+  console.log("deletion not successful");
+};
+
+onMounted(() => {
+  //call getEvents upon load
+  getEvents();
+});
 </script>
 
 <template>
@@ -342,6 +566,7 @@ function hasEvent(date, hour) {
       <div class="week-navigation">
         <button @click="moveToLastWeek">Last Week</button>
         <button @click="moveToNextWeek">Next Week</button>
+        <!--<button @click="getEvents">Show My Events</button>-->
       </div>
       <div class="table-wrapper">
         <table class="fl-table">

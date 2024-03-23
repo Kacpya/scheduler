@@ -1,9 +1,8 @@
 <template>
     <header>
         <div class="logo">
-            <a href="https://imgbox.com/W498v2sL" target="_blank"><img
-                    src="https://thumbs2.imgbox.com/16/9f/W498v2sL_t.jpg" alt="Logo" /></a>
-
+            <a href="https://imgbox.com/0bBpBZDc" target="_blank"><img src="https://thumbs2.imgbox.com/1a/8b/0bBpBZDc_t.png"
+                    alt="Logo" /></a>
         </div>
         <nav class="menu">
             <ul>
@@ -20,15 +19,37 @@
 
             </ul>
             <ul class="right-menu">
+                <!--
+                <li v-if="!loggedIn"><a href="#" class="login-btn"><router-link to="/login">Log in</router-link></a></li>
+                <li v-if="!loggedIn"><a href="#"><router-link to="/register">Sign up</router-link></a></li>
+                -->
                 <li><a href="#" class="login-btn"><router-link to="/login">Log in</router-link></a></li>
                 <li><a href="#"><router-link to="/register">Sign up</router-link></a></li>
+            </ul>
+            <ul class="logout-menu">
+                <li v-if="loggedIn"><a href="#" class="logout-btn"><router-link to="/register">Log Out</router-link></a></li>
             </ul>
         </nav>
     </header>
 </template>
-
+  
 <script>
+import { ref, computed } from 'vue';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
+
 export default {
     name: 'Header',
+    setup() {
+        const loggedIn = ref(false);
+        //if logged in
+        const auth = getAuth();
+        onAuthStateChanged(auth, (user) => {
+            loggedIn.value = !!user; 
+        });
+        return {
+            loggedIn
+        };
+    }
 };
+
 </script>

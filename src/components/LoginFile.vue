@@ -1,43 +1,94 @@
-<script setup>
-</script>
-
 <template>
-   <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="initial-scale=1">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
- 
-</head>
-<body>    
-  <div class="site-content">
-    <div class="container">
-      <div class="row justify-content-center">
-        <div class="col">
-          <div class="form-container">
-            <form>
-              <div class="form-group">
-                <label for="exampleInputEmail1">Email address</label>
-                <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
-                <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
-              </div>
-              <div class="form-group">
-                <label for="exampleInputPassword1">Password</label>
-                <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
-              </div>
-              <div class="form-group form-check">
-                <input type="checkbox" class="form-check-input" id="exampleCheck1">
-                <label class="form-check-label" for="exampleCheck1">Check me out</label>
-              </div>
-              <button type="submit" class="btn btn-primary">Submit</button>
-            </form>
-          </div>
-        </div>
+  <div class="login-container">
+    <h2>Login</h2>
+      <div class="form-group">
+          <label for="exampleInputEmail1">Email address</label>
+          <input type="email" v-model="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
+              placeholder="example@gmail.com">
+          <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
       </div>
-    </div>
+      <div class="form-group">
+          <label for="exampleInputPassword1">Password</label>
+          <input type="password" v-model="password" class="form-control" id="exampleInputPassword1"
+              placeholder="Password">
+      </div>
+      <button @click="login" class="btn btn-primary">Login</button>
   </div>
-</body>
-
- 
 </template>
 
+<script>
+import { getevents } from "../../functions";
+import app from "../api/firebase"
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+export default {
+  name: "Login", data() {
+      return {
+          email: "",
+          password: ""
+      }
+  },
+  methods: {
+      login() {
+          const auth = getAuth(app);
+          signInWithEmailAndPassword(auth, this.email, this.password)
+              .then((userCredential) => {
+                  // Signed in
+                  const user = userCredential.user;
+                  console.log(user);
+                  this.$router.push({path: '/'})
+                  // ...
+              })
+              .catch((error) => {
+                  const errorCode = error.code; 
+                  const errorMessage = error.message; 
+                  
+                  console.log(errorCode)
+                  console.log(errorMessage)
+                  // ..          
+              });
+      }
+  }
+}
+</script>
 
+
+<style scoped>
+.login-container {
+  max-width: 300px;
+  margin: 0 auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 50vh; 
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+input {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+}
+
+button {
+  background-color: #4caf50;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.error-message {
+  color: #ff0000;
+  margin-top: 10px;
+}
+
+</style>
