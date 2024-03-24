@@ -9,7 +9,6 @@ const EditpopupVisible = ref(false);
 const CreatepopupVisible = ref(false);
 const events = ref([]);
 const eventsMap = ref(new Map()); // Map to store events by date and time
-const createdEventCells = ref([]);
 
 class Event {
   constructor(name, date, startHour, endHour, color) {
@@ -30,7 +29,6 @@ const padZero = (num) => (num < 10 ? `0${num}` : num);
 
 const days = ref([]);
 const hours = Array.from({ length: 24 }, (_, i) => i);
-const showPastEvents = ref(false);
 
 let eventsArray = [];
 // Initialize days with the current week
@@ -91,7 +89,7 @@ function handleEvent(action) {
   if (action === 'create') {
     createEvent(eventDetails.value);
   } else if (action === 'edit') {
-    editEvent();
+    editEvent(eventDetails.value);
   } else if (action === 'delete') {
     deleteEvent(eventDetails.value);
   }
@@ -165,6 +163,7 @@ function createEvent(eventDetails) {
   closePopup();
 }
 
+/**
 function editEvent() {
   const { date, startHour, endHour, duration } = eventDetails.value;
 
@@ -212,6 +211,17 @@ function editEvent() {
     EditpopupVisible.value = false;
   }
 }
+ */
+
+function editEvent(eventDetails) {
+  const { date, startHour, endHour } = eventDetails;
+  console.log("date", date);
+  deleteEvent(eventDetails);
+  postEvent(eventName.value, startHour, endHour, getRandomColor(), date.toDateString());
+}
+
+ 
+
 
 /**
 function deleteEvent(eventDetails) {
@@ -268,7 +278,7 @@ function deleteEvent(eventDetails) {
  */
 
 function deleteEvent(eventDetails) {
-  findEventForDeletionInDatabase(eventDetails).then(() => {
+  findEventForDeletionInDatabase(eventDetails).then(() => { //delete event from database and then update the schedule
     events.value = events.value.filter(event => {
       const eventToDeleteDate = eventDetails.date.toDateString();
       const eventDate = event.date.toDateString();
