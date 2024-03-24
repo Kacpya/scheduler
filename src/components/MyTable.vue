@@ -250,16 +250,39 @@ function findEventForDeletionInDatabase(eventToDelete) {
 
     let eventToDeleteDate = eventToDelete.date.toDateString();
 
+    console.log("findEventForDeletionInDatabase 1");
+
     for (var i = 0; i < eventsArray.length; i++) {
       if (currentUserID == eventsArray[i].data.uid) { //if current users event
-
+        console.log("findEventForDeletionInDatabase 2");
         //database information
         const eventDetailsSplit = eventsArray[i].data.event.split(',');
         const [eventName, startHour, endHour, eventColor, dateString] = eventDetailsSplit;
 
+        console.log("dateString:", dateString);
+        console.log("eventToDeleteDate:", eventToDeleteDate);
+        console.log("startHour:", startHour);
+        console.log("eventToDelete.startHour:", eventToDelete.startHour);
+        console.log("endHour:", endHour);
+        console.log("eventToDelete.endHour:", eventToDelete.endHour);
+
+        const date1 = new Date(dateString);
+        const date2 = new Date(eventToDeleteDate);
+
+        if (dateString == eventToDeleteDate) {
+          console.log("dates same")
+        }
+        if (startHour == eventToDelete.startHour) {
+          console.log("starts same")
+        }
+        if (endHour == eventToDelete.endHour) {
+          console.log("ends same")
+        }
+
         if (dateString == eventToDeleteDate && startHour == eventToDelete.startHour && endHour == eventToDelete.endHour) { //find event with same date and time
-          console.log(eventsArray[i].id);
-          deleteEventFromDatabase("eventsArray[i].data", eventsArray[i].id);
+          console.log("findEventForDeletionInDatabase 3");
+          console.log("eventsArray[i].data", eventsArray[i].id);
+          deleteEventFromDatabase(eventsArray[i].id);
         }
       }
     }
@@ -364,6 +387,8 @@ function generateUsersEventsFromDatabase(eventsArray) {
       //console.log("eventsArray[i].data.uid ", eventsArray[i].data.uid);
       //console.log("eventsArray[i].data.event ", eventsArray[i].data.event);
       // split event string into its smaller components
+      console.log("Event: " + eventsArray[i].data.event + " loaded from database into schedule");
+
       const eventDetailsSplit = eventsArray[i].data.event.split(',');
 
       const [eventName, startHour, endHour, eventColor, dateString] = eventDetailsSplit;
@@ -465,10 +490,10 @@ const postEvent = (eventName, startHour, endHour, color, date) => {
         console.log(result);
         // Read result of the Cloud Function.
         /** @type {any} */
-        //if (getEvents) {
-          //getEvents(); // Call getEvents if it's provided
-        //}
-        console.log(result);
+        if (getEvents) {
+          getEvents(); //recall getEvents if it's provided
+        }
+        //console.log(result);
         //loader.hide();
       });
   }
@@ -497,7 +522,7 @@ const getEvents = () => {
         //loader.hide();
         if (result.data != "No data in database") {
           eventsArray = result.data;
-          generateUsersEventsFromDatabase(eventsArray);
+          displayDatabaseEvents(eventsArray);
           console.log("eventsArray1: ");
           console.log(eventsArray);
         } else {
@@ -524,13 +549,13 @@ const deleteEventFromDatabase = (id) => {
     console.log(result);
     //loader.hide();
     if (result.data == "Document successfully deleted")
-      this.getComments() // To refresh the client
+      getEvents(); // To refresh the client
   });
   console.log("deletion not successful");
 };
 
-onMounted(() => {
-  //call getEvents upon load
+//call getEvents upon load
+onMounted(() => { 
   getEvents();
 });
 </script>
