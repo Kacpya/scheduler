@@ -97,13 +97,14 @@ function handleEvent(action) {
   }
 }
 
+/**
 function createEvent(eventDetails) {
   const { date, startHour, endHour } = eventDetails;
   console.log("date", date);
   const eventNameValue = eventName.value;
-  const duration = endHour - startHour + 1; // Calculate duration
+  const duration = endHour - startHour + 1; 
 
-  const existingEvent = getEventByDateTime(date); // Check if an event already exists for the specified date
+  const existingEvent = getEventByDateTime(date); //check if an event already exists for the date
 
   if (existingEvent) {
     console.log('Event already exists for this date and time');
@@ -113,10 +114,13 @@ function createEvent(eventDetails) {
   // Create a new event
   const randomColor = getRandomColor(); // Generate random color
 
-  const eventColor = randomColor; //for storing event color
+  console.log('Type of eventNameValue:', typeof eventNameValue);
+  console.log('Type of date:', typeof (new Date(date)));
+  console.log('Type of startHour:', typeof startHour);
+  console.log('Type of endHour:', typeof endHour);
+  console.log('Type of randomColor:', typeof randomColor);
 
-
-  const event = new Event(eventNameValue, new Date(date), startHour, endHour, randomColor);
+  const event = new Event(eventNameValue, new Date(date), parseInt(startHour), parseInt(endHour), randomColor);
 
   // Loop through each hour within the duration and add the event to each hour
   for (let i = 0; i < duration; i++) {
@@ -139,7 +143,7 @@ function createEvent(eventDetails) {
     }
   }
 
-  postEvent(eventName.value, startHour, endHour, eventColor, date.toDateString());
+  postEvent(eventName.value, startHour, endHour, randomColor, date.toDateString());
 
   // Update the events map
   updateEventsMap();
@@ -149,6 +153,16 @@ function createEvent(eventDetails) {
 
   // Clear event name after creating event
   eventName.value = '';
+}
+ */
+
+function createEvent(eventDetails) {
+  const { date, startHour, endHour } = eventDetails;
+  console.log("date", date);
+  postEvent(eventName.value, startHour, endHour, getRandomColor(), date.toDateString());
+  updateEventsMap();
+  getEvents();
+  closePopup();
 }
 
 function editEvent() {
@@ -199,8 +213,15 @@ function editEvent() {
   }
 }
 
+/**
 function deleteEvent(eventDetails) {
-  const { date, startHour, duration } = eventDetails;
+  console.log("deleteEvent start")
+  const { date, startHour, endHour, duration } = eventDetails;
+  console.log("eventDetails in deleteEvent: ", eventDetails)
+  console.log("date in deleteEvent: ", date)
+  console.log("typeof date in deleteEvent: ", typeof date)
+  console.log("eventsArray in deleteEvent: ", eventsArray)
+  updateEventsMap();
   const eventToDelete = getEventByDateTime(date); //find the event using its date
   
   
@@ -209,9 +230,11 @@ function deleteEvent(eventDetails) {
     events.value = events.value.filter(event =>
       !(event.date.getTime() === eventToDelete.date.getTime() &&
         event.startHour === eventToDelete.startHour)
-    );
+    );  
+    console.log("event removed from events array")
 
-
+    
+    
     // Remove the event from the events map
     const dateKey = getDateKey(date);
     for (let i = 0; i < duration; i++) {
@@ -222,6 +245,7 @@ function deleteEvent(eventDetails) {
         if (eventsMap.value.get(dateKey).size === 0) {
           eventsMap.value.delete(dateKey);
         }
+        console.log("event removed from events map")
       }
 
       // Clear the related cell
@@ -241,52 +265,85 @@ function deleteEvent(eventDetails) {
 
   }
 }
+ */
+
+function deleteEvent(eventDetails) {
+  findEventForDeletionInDatabase(eventDetails).then(() => {
+    events.value = events.value.filter(event => {
+      const eventToDeleteDate = eventDetails.date.toDateString();
+      const eventDate = event.date.toDateString();
+      const isSameDate = eventToDeleteDate === eventDate;
+      const isSameTimeRange = event.startHour === eventDetails.startHour && event.endHour === eventDetails.endHour;
+      return !(isSameDate && isSameTimeRange);
+    });
+    closePopup();
+  }).catch(error => {
+    console.error('Error deleting event:', error);
+  });
+}
 
 function findEventForDeletionInDatabase(eventToDelete) {
-  if (eventToDelete != null) {
-    const auth = getAuth(app);
-    const currentUser = auth.currentUser;
-    const currentUserID = currentUser.uid;
+  return new Promise((resolve, reject) => {
+    console.log("findEventForDeletionInDatabase start")
+    if (eventToDelete != null) {
+      const auth = getAuth(app);
+      const currentUser = auth.currentUser;
+      const currentUserID = currentUser.uid;
 
-    let eventToDeleteDate = eventToDelete.date.toDateString();
+      let eventToDeleteDate = eventToDelete.date.toDateString();
 
-    console.log("findEventForDeletionInDatabase 1");
+      console.log("findEventForDeletionInDatabase 1");
 
-    for (var i = 0; i < eventsArray.length; i++) {
-      if (currentUserID == eventsArray[i].data.uid) { //if current users event
-        console.log("findEventForDeletionInDatabase 2");
-        //database information
-        const eventDetailsSplit = eventsArray[i].data.event.split(',');
-        const [eventName, startHour, endHour, eventColor, dateString] = eventDetailsSplit;
+      for (var i = 0; i < eventsArray.length; i++) {
+        if (currentUserID == eventsArray[i].data.uid) { //if current users event
+          console.log("findEventForDeletionInDatabase 2");
+          //database information
+          const eventDetailsSplit = eventsArray[i].data.event.split(',');
+          const [eventName, startHour, endHour, eventColor, dateString] = eventDetailsSplit;
 
-        console.log("dateString:", dateString);
-        console.log("eventToDeleteDate:", eventToDeleteDate);
-        console.log("startHour:", startHour);
-        console.log("eventToDelete.startHour:", eventToDelete.startHour);
-        console.log("endHour:", endHour);
-        console.log("eventToDelete.endHour:", eventToDelete.endHour);
+          //console.log("dateString:", dateString);
+          //console.log("eventToDeleteDate:", eventToDeleteDate);
+          //console.log("startHour:", startHour);
+          //console.log("eventToDelete.startHour:", eventToDelete.startHour);
+          //console.log("endHour:", endHour);
+          //console.log("eventToDelete.endHour:", eventToDelete.endHour);
 
-        const date1 = new Date(dateString);
-        const date2 = new Date(eventToDeleteDate);
+          if (dateString == eventToDeleteDate) {
+            //console.log("dates same")
+          }
+          if (startHour == eventToDelete.startHour) {
+            //console.log("starts same")
+          }
+          if (endHour == eventToDelete.endHour) {
+            console.log("ends same")
+          }
 
-        if (dateString == eventToDeleteDate) {
-          console.log("dates same")
+          if (dateString == eventToDeleteDate && startHour == eventToDelete.startHour && endHour == eventToDelete.endHour) { //find event with same date and time
+            console.log("findEventForDeletionInDatabase 3");
+            console.log("eventsArray[i].data", eventsArray[i].id);
+            deleteEventFromDatabase(eventsArray[i].id);
+            resolve();
+            return;
+          }
         }
-        if (startHour == eventToDelete.startHour) {
-          console.log("starts same")
-        }
-        if (endHour == eventToDelete.endHour) {
-          console.log("ends same")
-        }
+      }
+      reject(new Error('Event not found'));
+    }
 
-        if (dateString == eventToDeleteDate && startHour == eventToDelete.startHour && endHour == eventToDelete.endHour) { //find event with same date and time
-          console.log("findEventForDeletionInDatabase 3");
-          console.log("eventsArray[i].data", eventsArray[i].id);
-          deleteEventFromDatabase(eventsArray[i].id);
+    if (eventToDelete) {
+      for (let i = eventToDelete.startHour; i <= eventToDelete.endHour; i++) {
+        const cellIdToDelete = cellId(eventToDelete.date, i);
+        const cellToDelete = document.getElementById(cellIdToDelete);
+        if (cellToDelete) {
+          cellToDelete.classList.remove('event-cell');
+          cellToDelete.style.backgroundColor = ''; //reser background
         }
       }
     }
-  }
+
+    getEvents();
+    console.log("findEventForDeletionInDatabase end")
+  });
 }
 
 function getRandomColor() {
@@ -368,7 +425,6 @@ function hasEvent(date, hour) {
 }
 
 function displayDatabaseEvents(eventsArray) {
-  events.value = []; //clear events
   generateUsersEventsFromDatabase(eventsArray); //generate events from database
 }
 
@@ -384,37 +440,27 @@ function generateUsersEventsFromDatabase(eventsArray) {
   //create user events from database
   for (var i = 0; i < eventsArray.length; i++) {
     if (currentUserID == eventsArray[i].data.uid) { //if current users event
-      //console.log("eventsArray[i].data.uid ", eventsArray[i].data.uid);
-      //console.log("eventsArray[i].data.event ", eventsArray[i].data.event);
-      // split event string into its smaller components
-      console.log("Event: " + eventsArray[i].data.event + " loaded from database into schedule");
-
+      
+      //console.log("Event: " + eventsArray[i].data.event + " loaded from database into schedule");
+      
+      //split event string into its smaller components
       const eventDetailsSplit = eventsArray[i].data.event.split(',');
 
       const [eventName, startHour, endHour, eventColor, dateString] = eventDetailsSplit;
       const startHourInt = parseInt(startHour);
       const endHourInt = parseInt(endHour);
+      let evColor = '#73EC7F';
+
       const date = new Date(dateString);
       
-      const event = new Event(eventName, date, startHourInt, endHourInt, eventColor);
+      const event = new Event(eventName, new Date(date), startHourInt, endHourInt, evColor);
 
-      /**
-        console.log("Event Name:", eventName);
-        console.log("Start Hour:", startHour);
-        console.log("End Hour:", endHour);
-        console.log("Color:", eventColor);
-        console.log("Date:", date);
-       */
-
-      let duration = endHour - startHour;
-      if (duration == 0) {
-        duration = 1;
-      }
+  
+      let duration = endHour - startHour + 1;
       // Loop through each hour within the duration and add the event to each hour
       for (let i = 0; i < duration; i++) {
         const hour = startHour + i;
-        const cellIdToAdd = cellId(date, hour);
-
+        
         // store the event object
         events.value.push(event);
 
@@ -424,21 +470,23 @@ function generateUsersEventsFromDatabase(eventsArray) {
           const cell = document.getElementById(cellId(days.value[dayIndex], hour));
           if (cell) {
             cell.classList.add('event-cell');
-            cell.style.backgroundColor = randomColor;
+            cell.style.backgroundColor = evColor;
 
             // Store related cell in the event
             event.cells.push(cell);
           }
         }
       }
-      //update the events map
-      updateEventsMap();
+      
+      
     }
+    
   }
-  
+  //update the events map
+  updateEventsMap();
 
   // Clear event name after creating event
-  eventName.value = '';
+  //eventName.value = '';
 }
 
 
@@ -491,7 +539,7 @@ const postEvent = (eventName, startHour, endHour, color, date) => {
         // Read result of the Cloud Function.
         /** @type {any} */
         if (getEvents) {
-          getEvents(); //recall getEvents if it's provided
+          getEvents(); //recall getEvents 
         }
         //console.log(result);
         //loader.hide();
@@ -503,10 +551,11 @@ const postEvent = (eventName, startHour, endHour, color, date) => {
 };
 
 const getEvents = () => {
+  console.log("getEvents called")
   const functions = getFunctions(app);
   const getEvents = httpsCallable(functions, 'getevents');
 
-
+  eventsArray = [];
   //let loader = this.$loading.show({
   // Optional parameters  
   //container: this.$refs.container,
@@ -517,10 +566,10 @@ const getEvents = () => {
       .then((result) => {
         // Read result of the Cloud Function.
         // /** @type {any} */
-        console.log("getevent result: ");
-        console.log(result);
+        console.log(result); 
         //loader.hide();
         if (result.data != "No data in database") {
+          console.log("getEvents if statement")
           eventsArray = result.data;
           displayDatabaseEvents(eventsArray);
           console.log("eventsArray1: ");
@@ -534,6 +583,8 @@ const getEvents = () => {
   } catch (error) {
     console.error("Error getting events:", error);
   }
+  
+  console.log("getEvents end")
 };
 
 const deleteEventFromDatabase = (id) => {
