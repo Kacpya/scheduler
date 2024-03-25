@@ -1,13 +1,13 @@
 <template>
     <header>
         <div class="logo">
-             <a href="https://imgbox.com/37VHMbz3" target="_blank"><img src="https://thumbs2.imgbox.com/f7/4c/37VHMbz3_t.jpg" alt="Logo"/></a>
-</a>
+            <a href="https://imgbox.com/37VHMbz3" target="_blank"><img src="https://thumbs2.imgbox.com/f7/4c/37VHMbz3_t.jpg" alt="image host"/></a>
+
         </div>
         <nav class="menu">
             <ul>
                 <li><a href="#"><router-link to="/">Home</router-link></a></li>
-                <li><a href="#"><router-link to="/about-us">About-Us</router-link></a></li>
+                <li><a href="#"><router-link to="/about-us">About Us</router-link></a></li>
 
                 <li><a href="#"><router-link to="/login">My account</router-link></a>
                     <ul>
@@ -19,37 +19,15 @@
 
             </ul>
             <ul class="right-menu">
-                <!--
-                <li v-if="!loggedIn"><a href="#" class="login-btn"><router-link to="/login">Log in</router-link></a></li>
-                <li v-if="!loggedIn"><a href="#"><router-link to="/register">Sign up</router-link></a></li>
-                -->
                 <li><a href="#" class="login-btn"><router-link to="/login">Log in</router-link></a></li>
-                <li><a href="#"><router-link to="/register">Sign up</router-link></a></li>
-            </ul>
-            <ul class="logout-menu">
-                <li v-if="loggedIn"><a href="#" class="logout-btn"><router-link to="/register">Log Out</router-link></a></li>
+                <li><a href="#"><router-link to="/login">Sign up</router-link></a></li>
             </ul>
         </nav>
     </header>
 </template>
   
 <script>
-import { ref, computed } from 'vue';
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
-
 export default {
     name: 'Header',
-    setup() {
-        const loggedIn = ref(false);
-        //if logged in
-        const auth = getAuth();
-        onAuthStateChanged(auth, (user) => {
-            loggedIn.value = !!user; 
-        });
-        return {
-            loggedIn
-        };
-    }
 };
-
 </script>
