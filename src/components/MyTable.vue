@@ -22,6 +22,8 @@ class Event {
   }
 }
 
+let userHandle = "";
+
 const eventDetails = ref({ date: new Date(), startHour: '', endHour: '', duration: 1 });
 const eventName = ref('');
 
@@ -29,6 +31,8 @@ const padZero = (num) => (num < 10 ? `0${num}` : num);
 
 const days = ref([]);
 const hours = Array.from({ length: 24 }, (_, i) => i);
+
+let eventForEditing = null;
 
 let eventsArray = [];
 // Initialize days with the current week
@@ -61,10 +65,17 @@ function updateDays() {
 }
 
 function clickCell(day, hour) {
+  
   const date = new Date(day.date);
   date.setHours(hour);
 
   const event = getEventByDateTime(date);
+
+
+  
+
+  //console.log("event in clickcell " + event)
+
 
   if (event) {
     // Set event details
@@ -75,6 +86,7 @@ function clickCell(day, hour) {
       duration: event.duration
     };
     eventName.value = event.name;
+    eventForEditing = event; //for storing clicked event when editing event for deletion from database
     EditpopupVisible.value = true;
   } else {
     // Set event details for new event
@@ -215,8 +227,9 @@ function editEvent() {
 
 function editEvent(eventDetails) {
   const { date, startHour, endHour } = eventDetails;
-  console.log("date", date);
-  deleteEvent(eventDetails);
+  console.log(" new eventDetails to delete: ", eventForEditing); //previous event (event to be edited)
+  console.log("eventDetails to delete: ", eventDetails);  //new event to be created
+  deleteEvent(eventForEditing);
   postEvent(eventName.value, startHour, endHour, getRandomColor(), date.toDateString());
 }
 
@@ -495,10 +508,7 @@ function generateUsersEventsFromDatabase(eventsArray) {
   //update the events map
   updateEventsMap();
 
-  // Clear event name after creating event
-  //eventName.value = '';
 }
-
 
 import app from '../api/firebase';
 import { getFunctions, httpsCallable, connectFunctionsEmulator } from "firebase/functions";
@@ -520,6 +530,7 @@ onAuthStateChanged(auth, (curUser) => {
   if (curUser) {
     console.log("User", user);
     user.value = curUser; // set the user object to the user prop
+    getUserHandle();
     // User is signed in
   } else {
     console.log("No user found")
@@ -559,6 +570,73 @@ const postEvent = (eventName, startHour, endHour, color, date) => {
     console.error("Error posting event:", error);
   }
 };
+
+//get the users handle to display in header
+const getUserHandle = () => {
+  console.log("getuserhandle called")
+  const functions = getFunctions(app);
+  const getUserHandle = httpsCallable(functions, 'getuserhandle');
+  const auth = getAuth(app);
+  const currentUser = auth.currentUser;
+  const currentUserID = currentUser.uid;
+
+  let usersArray = [];
+  
+  try {
+    getUserHandle()
+      .then((result) => {
+        // Read result of the Cloud Function.
+        // /** @type {any} */
+        console.log(result);
+        //loader.hide();
+        if (result.data != "No data in database") {
+          console.log("getuserhandle if statement")
+          usersArray = result.data;
+          console.log("usersArray: ");
+          console.log(usersArray);
+
+          var found = false
+          //find this particular users handle in array
+          usersArray.forEach(user => {
+            if (user.uid != undefined && !found) {
+              
+            
+            console.log("curruserdataid: " + user.uid);
+            console.log("curruserid: " + user.uid);
+            if (user.uid == currentUserID && user.username != null) {
+              console.log("curruser: " + user);
+              userHandle = user.username; //set handle to associated username
+              console.log("userHandle: " + userHandle);
+              found = true; //stop searching
+            }     
+          }
+          else {
+              console.log("no matching username found");
+            }
+          }); // <- Added missing closing parenthesis here
+        }
+        else {
+          usersArray =[];
+          console.log("usersArray: ");
+          console.log(usersArray);
+        }
+      })
+      .catch (error => {
+        console.error("Error getting users:", error);
+      });
+  } 
+  catch (error) {
+    console.error("Error:", error);
+  }
+
+  console.log("test_________________________________");
+
+  console.log("getuserhandle end");
+};
+
+
+
+
 
 const getEvents = () => {
   console.log("getEvents called")

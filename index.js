@@ -62,6 +62,25 @@ exports.getevents = functions.https.onRequest((request, response) => {
   });
 });
 
+exports.getuserhandle = functions.https.onRequest((request, response) => {
+  cors(request, response, () => {
+    // 1. Connect to our Firestore database
+    let myData = []
+    return admin.firestore().collection('users').get().then((snapshot) => {
+      if (snapshot.empty) {
+        console.log('No matching documents.');
+        response.send({ data: 'No data in database' });
+        return;
+      }
+      snapshot.forEach(doc => {
+        myData.push(Object.assign(doc.data(), { id: doc.id }));
+      });
+      // 2. Send data back to client
+      response.send({ data: myData });
+    });
+  });
+});
+
 exports.deleteuserevent = functions.https.onCall((data, context) => {
   if (typeof context.auth === 'undefined') {
     // request is made from an anonymous user
