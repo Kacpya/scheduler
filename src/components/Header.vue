@@ -1,8 +1,8 @@
 <template>
     <header>
         <div class="logo">
-            <a href="https://imgbox.com/0bBpBZDc" target="_blank"><img src="https://thumbs2.imgbox.com/1a/8b/0bBpBZDc_t.png"
-                    alt="Logo" /></a>
+             <a href="https://imgbox.com/37VHMbz3" target="_blank"><img src="https://thumbs2.imgbox.com/f7/4c/37VHMbz3_t.jpg" alt="Logo"/></a>
+</a>
         </div>
         <nav class="menu">
             <ul>
