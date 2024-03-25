@@ -11,19 +11,63 @@
 }
 
 .site-content {
-  margin-top: 100px; /* Adjust margin to accommodate the menu bar height */
+  margin-top: 80px;
+  position: relative;
+  z-index: 1;
 }
 
-h1 {
-  font-size: 30px;
-  color: #9c2828;
-  text-transform: uppercase;
-  font-weight: 300;
-  text-align: center;
-  margin-bottom: 15px;
+h1 {  color: #333;; font-family: 'Raleway',sans-serif; font-size: 62px; font-weight: 800; line-height: 72px; margin: 0 0 24px; text-align: center; text-transform: uppercase; }
+
+h2 { color: #555; font-family: 'Raleway',sans-serif; font-size: 30px; font-weight: 800; line-height: 36px; margin: 0 0 24px; text-align: center; }
+
+p { color: #777;; font-family: 'Raleway',sans-serif; font-size: 18px; font-weight: 500; line-height: 32px; margin: 0 0 24px; }
+
+
+section {
+  background-color: #ffffff;
+  border-radius: 10px;
+  padding: 30px;
+  margin-bottom: 30px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
+#social-media{
+  background-color: #e1b9f9c9;
+ border-radius: 10px;
+ padding: 30px;
+ margin-bottom: 30px;
+ box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+ul {
+  list-style: none;
+  padding: 0;
+}
 
+ul li {
+  margin-bottom: 10px;
+}
+
+.team-member img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+#contact ul li,
+#social-media ul li {
+  font-size: 16px;
+}
+
+#social-media ul li a {
+  color: #333;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+#social-media ul li a:hover {
+  color: #777;
+}
 
 table {
   width: 100%;
@@ -33,7 +77,7 @@ table {
 .table-wrapper {
   overflow-x: auto;
   max-width: 100%;
-  margin-top: 20px;
+  margin-top: 10px;
   max-height: calc(100vh - 100px); /* Adjust the max height as needed */
 }
 .fl-table {
@@ -53,6 +97,7 @@ table {
     left: 0;
     z-index: 2;
     min-width: auto; /* Reset min-width for the first column */
+  
   }
   
   .fl-table th.hour {
@@ -115,6 +160,22 @@ body {
   background-color: #0056b3;
 }
 
+.week-navigation{
+  display: flex;
+  
+  justify-content: space-between;
+}
+
+
+.left-button {
+  position: absolute;
+  left: 0;
+}
+
+.right-button {
+  position: absolute;
+  right: 0;
+}
 .event {
   position: absolute;
   top: 2px;
@@ -128,7 +189,7 @@ body {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background-color: rgb(255, 255, 255);
+  background-color: white;
   padding: 20px;
   border: 1px solid #ccc;
   z-index: 999;
@@ -154,11 +215,10 @@ button {
 
 .popup {
   position:absolute;
-  top: 70%;
+  top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: linear-gradient(45deg, #7bd3d0, #3b93db);
-  border-radius: 20px;
+  background-color: white;
   padding: 20px;
   z-index: 1000;
   border: 1px solid black;
@@ -173,18 +233,15 @@ button {
 }
 
 .close-button {
-  position: absolute;
-  top: 5px;
-  right: 5px;
-  width: 25px;
-  height: 25px;
-  background-color: red;
-  color: white;
-  border: none;
-  border-radius: 50%;
-  cursor: pointer;
-  font-size: 16px;
-  line-height: 1;
+  position: absolute; /* Position the close button absolutely */
+  top: 10px; /* Distance from the top */
+  right: 10px; /* Distance from the right */
+  background: none; /* Transparent background */
+  border: none; /* No border */
+  color: rgb(209, 17, 17); /* Text color */
+  font-size: 19px; /* Font size */
+  cursor: pointer; /* Cursor style */
+  transition: transform 0.3s ease; /* Add transition effect */
 }
 
 .popup {
@@ -195,11 +252,6 @@ button {
   background-color: darkred;
 }
 
-.close {
-  color: red;
-  float: right;
-  cursor:pointer;
-}
 
 .login-button{
   background-color: #918e8e;
@@ -228,29 +280,31 @@ td:hover {
 
 header {
   display: flex;
-  align-items: center; /* Center items vertically */
-  position: fixed; /* Set position to fixed */
-  width: 100%; /* Make it span the full width */
-  top: 0; /* Stick to the top of the viewport */
-  background-color: #000000; /* Adjust background color as needed */
-  z-index: 1000; /* Ensure it appears above other content */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add a shadow for depth */
+  align-items: center;
+  position: fixed;
+  width: 100%;
+  top: 0;
+  height: 70px; /* Reduced height */
+  background-color: #000000;
+  z-index: 1000;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
-
-
 .logo {
-  margin-right: 20px;
+  margin-right: 10px; /* Reduced margin */
 }
 
 .logo img {
-  width: 190px;
-  height: auto;
+  max-height: 100%; /* Ensure the logo stays within the container */
+  width: auto;
+  max-width: 100%; /* Adjusted max-width */
 }
 
 .menu {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  width: calc(100% - 100px); /* Adjusted width */
+  margin: 0 auto; /* Center the menu horizontally */
 }
 
 nav ul {
@@ -265,41 +319,53 @@ nav ul li {
 }
 
 nav ul li a {
-  color: #dbd9d9; /* Dark text color */
+  color: #dbd9d9;
   text-decoration: none;
-  padding: 10px 20px;
-  transition: color 0.3s ease, background-color 0.3s ease;
-  position: relative;
+  padding: 10px 15px;
+  transition: color 0.3s ease, background-color 0.3s ease; /* Transition for color and background-color */
+  white-space: nowrap;
 }
 
 nav ul li a:hover {
-  background-color: #f0f0f0; /* Light background color on hover */
-}
-
-nav ul li ul.submenu {
-  display: none;
-  position: absolute;
-  top: calc(100% - 1px);
-  left: 0;
-  width: 200px; /* Adjust width as needed */
-  background: #ffffff; /* White background color */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Submenu box shadow */
-  border-radius: 0 0 8px 8px; /* Rounded corners for submenu */
-  z-index: 1000;
-  opacity: 0;
-  transition: opacity 0.3s ease, transform 0.3s ease;
-  transform: translateY(-10px);
+  background-color: rgb(160, 101, 212);
+  color: #000000; /* Change text color on hover */
+  transform: scale(1.1); /* Scale effect on hover */
 }
 
 nav ul li ul {
   display: none;
   position: absolute;
-  top: 100%;
+  top: calc(100% + 5px); /* Adjusted top position with 5px of space */
   left: 0;
-  background: #ffffff; /* White background color */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Submenu box shadow */
-  border-radius: 0 0 8px 8px; /* Rounded corners for submenu */
+  width: 200px;
+  max-height: 300px;
+  overflow-y: auto;
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 0 0 8px 8px;
 }
+
+nav ul li ul li {
+  display: block;
+  position: relative;
+  margin-bottom: 8px;
+}
+
+
+
+nav ul li ul li a {
+  color: #000000;
+  padding: 10px 15px;
+  transition: color 0.3s ease, background-color 0.3s ease;
+  white-space: nowrap;
+}
+
+nav ul li ul li a:hover {
+  background-color: #f0f0f0;
+}
+
+
+
 
 nav ul li:hover ul {
   display: block;
@@ -308,19 +374,31 @@ nav ul li:hover ul {
 .right-menu {
   display: flex;
   align-items: center;
+  margin-left: auto; /* Pushes the buttons to the rightmost side */
 }
 
 .right-menu li {
-  margin-left: 20px;
+  margin-left: 15px;
 }
 
 .login-btn {
   color: #ffffff;
-  background-color: #007bff; /* Blue color for login button */
-  padding: 10px 20px;
+  background-color: #007bff;
+  padding: 10px 15px;
   border-radius: 8px;
   transition: background-color 0.3s ease;
 }
+
+.login-btn:hover {
+  background-color: #0056b3;
+}
+/* Media query for smaller screens */
+@media (max-width: 768px) {
+  nav ul li a {
+    padding: 10px 10px; /* Adjusted padding for smaller screens */
+  }
+}
+
 
 .login-btn:hover {
   background-color: #0056b3; /* Darker blue on hover */
@@ -338,53 +416,186 @@ nav ul li:hover ul {
 }
 
 .current-date {
-  background-color: rgba(173, 216, 230, 0.365); /* You can adjust the background color */
+  background-color: rgba(156, 209, 227, 0.365); /* You can adjust the background color */
 }
 
 .page-container {
   display: flex;
 }
 
-
-.calendar-container {
-  width: 300px;
-  margin-right: 100px;
+.calendar-overlay {
+  position: fixed; /* Position the calendar relative to the viewport */
+  top: 0; /* Align the calendar to the top of the viewport */
+  left: 0; /* Align the calendar to the left of the viewport */
+  width: 100%; /* Make the calendar take the full width of the viewport */
+  height: 100%; /* Make the calendar take the full height of the viewport */
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
+  z-index: 999; /* Ensure the calendar appears above other content */
+  overflow-y: auto; /* Allow vertical scrolling */
+  display: flex; /* Use flexbox for centering */
+  justify-content: center; /* Center the calendar horizontally */
+  align-items: center; /* Center the calendar vertically */
 }
 
 .real-time-calendar {
-  font-family: Arial, sans-serif;
   background-color: #08060b6f;
-  padding: 10px; 
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add a shadow for depth */
-
+  padding: 10px; /* Decrease padding for a shorter appearance */
+  border-radius: 5px;
+  box-shadow: 0px 40px 30px -20px rgba(0, 0, 0, 0.3);
+  width: 100%; /* Take full width */
+  max-width: 500px; /* Increase maximum width */
+  height: auto; /* Let the height adjust based on content */
+  position: relative; /* Ensure relative positioning for absolute child elements */
 }
 
-.real-time-calendar table {
-  width: 100%;
-  border-collapse: collapse;
-  
+.close-calendar {
+  position: absolute; /* Position the close button absolutely */
+  top: 10px; /* Distance from the top */
+  right: 10px; /* Distance from the right */
+  background: none; /* Transparent background */
+  border: none; /* No border */
+  color: white; /* Text color */
+  font-size: 24px; /* Font size */
+  cursor: pointer; /* Cursor style */
+  transition: transform 0.3s ease; /* Add transition effect */
 }
 
-.real-time-calendar th,
-.real-time-calendar td {
-  padding: 5px;
-  text-align: center;
+.close-calendar:hover {
+  transform: scale(1.2); /* Scale up the button on hover */
 }
+
+.close-calendar::before,
+.close-calendar::after {
+  content: 'X'; /* Content for the before and after pseudo-elements */
+  position: absolute; /* Position them absolutely */
+  top: 50%; /* Align them vertically */
+  left: 50%; /* Align them horizontally */
+  transform: translate(-50%, -50%); /* Center them properly */
+  font-size: 24px; /* Font size */
+}
+
+
+
+.close-calendar:focus {
+  outline: none; /* Remove outline on focus */
+}
+
+.calendar-container {
+  width: 400px; /* Increase width */
+  margin-right: 50px; /* Decrease margin for a shorter appearance */
+}
+
+.bi-calendar {
+  width: 1.5em;
+  height: 1.5em;
+}
+
+
+
+
+
 
 .current-day {
   background-color: lightblue;
 }
 
-
-.logout-menu {
-  position: right;
-  display: flex;
-  align-items: right;
-  margin-left: auto; /* Move the logout button to the far right */
+.event-cell {
+  background-color: #a205b38c; /* Default background color for event cells */
 }
 
-.logout-btn {
-  color: #ffffff;
-  background-color: #f14e4e;
-  border-radius: 8px;
+.event-objects {
+  position: relative; /* Ensure relative positioning for absolute positioning inside */
 }
+
+.event-object {
+  position: absolute;
+  border: 1px solid black;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  padding: 5px;
+  z-index: 2; /* Ensure event objects are displayed on top of the table */
+  background-color: white; /* Set background color to white */
+}
+
+.table-wrapper {
+  position: relative; /* Ensure relative positioning for absolute positioning inside */
+}
+
+
+
+/* CSS */
+.button-17 {
+  align-items: center;
+  appearance: none;
+  background-color: #fff;
+  border-radius: 24px;
+  border-style: none;
+  box-shadow: rgba(0, 0, 0, .2) 0 3px 5px -1px,rgba(0, 0, 0, .14) 0 6px 10px 0,rgba(0, 0, 0, .12) 0 1px 18px 0;
+  box-sizing: border-box;
+  color: #3c4043;
+  cursor: pointer;
+  display: inline-flex;
+  fill: currentcolor;
+  font-family: "Google Sans",Roboto,Arial,sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  height: 48px;
+  justify-content: center;
+  letter-spacing: .25px;
+  line-height: normal;
+  max-width: 100%;
+  overflow: visible;
+  padding: 2px 24px;
+  position: relative;
+  text-align: center;
+  text-transform: none;
+  transition: box-shadow 280ms cubic-bezier(.4, 0, .2, 1),opacity 15ms linear 30ms,transform 270ms cubic-bezier(0, 0, .2, 1) 0ms;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  width: auto;
+  will-change: transform,opacity;
+  z-index: 0;
+  
+}
+
+.button-17:hover {
+  background: #F6F9FE;
+  color: #174ea6;
+}
+
+.button-17:active {
+  box-shadow: 0 4px 4px 0 rgb(60 64 67 / 30%), 0 8px 12px 6px rgb(60 64 67 / 15%);
+  outline: none;
+}
+
+.button-17:focus {
+  outline: none;
+  border: 2px solid #4285f4;
+}
+
+.button-17:not(:disabled) {
+  box-shadow: rgba(60, 64, 67, .3) 0 1px 3px 0, rgba(60, 64, 67, .15) 0 4px 8px 3px;
+}
+
+.button-17:not(:disabled):hover {
+  box-shadow: rgba(60, 64, 67, .3) 0 2px 3px 0, rgba(60, 64, 67, .15) 0 6px 10px 4px;
+}
+
+.button-17:not(:disabled):focus {
+  box-shadow: rgba(60, 64, 67, .3) 0 1px 3px 0, rgba(60, 64, 67, .15) 0 4px 8px 3px;
+}
+
+.button-17:not(:disabled):active {
+  box-shadow: rgba(60, 64, 67, .3) 0 4px 4px 0, rgba(60, 64, 67, .15) 0 8px 12px 6px;
+}
+
+.button-17:disabled {
+  box-shadow: rgba(60, 64, 67, .3) 0 1px 3px 0, rgba(60, 64, 67, .15) 0 4px 8px 3px;
+}
+
+
+
+
+
