@@ -22,6 +22,9 @@
                 <li v-if="!loggedIn"><a href="#" class="login-btn"><router-link to="/login">Log in</router-link></a></li>
                 <li v-if="!loggedIn"><a href="#"><router-link to="/register">Sign up</router-link></a></li>
             </ul>
+            <ul class="logout-menu">
+                <li v-if="loggedIn"><a href="#" class="logout-btn"><router-link to="/register">Log Out</router-link></a></li>
+            </ul>
         </nav>
     </header>
 </template>
