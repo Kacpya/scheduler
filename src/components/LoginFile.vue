@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import { getevents } from "../../functions";
+//import { getevents } from "../../functions";
 import app from "../api/firebase"
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 export default {
