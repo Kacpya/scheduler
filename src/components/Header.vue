@@ -30,7 +30,21 @@
 </template>
   
 <script>
+import { ref, computed } from 'vue';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
+
 export default {
     name: 'Header',
+    setup() {
+        const loggedIn = ref(false);
+        //if logged in
+        const auth = getAuth();
+        onAuthStateChanged(auth, (user) => {
+            loggedIn.value = !!user; 
+        });
+        return {
+            loggedIn
+        };
+    }
 };
 </script>
