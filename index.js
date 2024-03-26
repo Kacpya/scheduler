@@ -62,6 +62,7 @@ exports.getevents = functions.https.onRequest((request, response) => {
   });
 });
 
+/** 
 exports.getuserhandle = functions.https.onRequest((request, response) => {
   cors(request, response, () => {
     // 1. Connect to our Firestore database
@@ -80,6 +81,7 @@ exports.getuserhandle = functions.https.onRequest((request, response) => {
     });
   });
 });
+*/
 
 exports.deleteuserevent = functions.https.onCall((data, context) => {
   if (typeof context.auth === 'undefined') {
