@@ -679,34 +679,36 @@ onMounted(() => {
   <div class="container">
     <div class="site-content">
       <div class="popup-wrapper" v-if="CreatepopupVisible || EditpopupVisible">
-        <div v-if="CreatepopupVisible || EditpopupVisible" class="popup">
-          <button class="close-button" @click="closePopup">&#10006;</button>
-          <h2>{{ EditpopupVisible ? 'Edit Event' : 'Create Event' }}</h2>
-          <input type="text" v-model="eventName" :id="EditpopupVisible ? 'editEventName' : 'createEventName'"
-            placeholder="Event Name">
-          <div>
-            <label for="startHour">Start Hour:</label>
-            <input type="number" v-model="eventDetails.startHour" min="0" max="23" required id="startHour">
-          </div>
-          <div>
-            <label for="endHour">End Hour:</label>
-            <input type="number" v-model="eventDetails.endHour" min="0" max="23" required id="endHour">
-          </div>
-
-          <template v-if="EditpopupVisible">
-            <button @click="handleEvent('edit')">Save Changes</button>
-            <button @click="handleEvent('delete')">Delete</button>
-          </template>
-          <template v-else>
-            <button @click="handleEvent('create')">Save</button>
-          </template>
+        <div class="popup">
+          <button class="close-button" @click="closePopup">X</button>
+          <h3>{{ EditpopupVisible ? 'Edit Event' : 'Create Event' }}</h3>
+          <form>
+            <div class="form-group">
+              <label for="eventName">Event Name:</label>
+              <input type="text" v-model="eventName" :id="EditpopupVisible ? 'editEventName' : 'createEventName'"
+                placeholder="Enter event name">
+            </div>
+            <div class="form-group">
+              <label for="startHour">Start Hour:</label>
+              <input type="number" v-model="eventDetails.startHour" min="0" max="23" required id="startHour">
+            </div>
+            <div class="form-group">
+              <label for="endHour">End Hour:</label>
+              <input type="number" v-model="eventDetails.endHour" min="0" max="23" required id="endHour">
+            </div>
+            <template v-if="EditpopupVisible">
+              <button class="btn-edit" @click="handleEvent('edit')">Save Changes</button>
+              <button class="btn-delete" @click="handleEvent('delete')">Delete</button>
+            </template>
+            <template v-else>
+              <button class="btn-create" @click="handleEvent('create')">Save</button>
+            </template>
+          </form>
         </div>
       </div>
-
       <div class="week-navigation">
-        <button @click="moveToLastWeek">Last Week</button>
-        <button @click="moveToNextWeek">Next Week</button>
-        <!--<button @click="getEvents">Show My Events</button>-->
+        <button class="button-17 " @click="moveToLastWeek">Last Week</button>
+        <button class="button-17 " @click="moveToNextWeek">Next Week</button>
       </div>
       <div class="table-wrapper">
         <table class="fl-table">
