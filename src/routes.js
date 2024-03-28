@@ -11,6 +11,8 @@ export default [
     { path: '/myTable', component: loadPage('Home') },
     { path: '/logOut', component: loadPage('LogOut') },
     { path: '/register', component: loadPage('Registration') },
+    { path: '/home', component: loadPage('Home') },
+    { path: '/Schedule', component: loadPage('Schedule') },
     { path: '/secure', component: loadPage('Secure'), beforeEnter : isAuth }
 ]
 

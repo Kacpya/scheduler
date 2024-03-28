@@ -1,4 +1,6 @@
+
 <template>
+    <div class = "site-content">
     <div class="registration-container">
         
         
@@ -9,10 +11,7 @@
                 aria-describedby="emailHelp" placeholder="example@gmail.com">
         </div>
 
-        <div class="form-group">
-            <label for="usernameInput">What can we call you?</label>
-            <input type="text" v-model="username" class="form-control" placeholder = "Username">
-        </div>
+
 
         <div class="form-group">
             <label for="exampleInputPassword1">Password</label>
@@ -21,7 +20,10 @@
         </div>
         
         <button @click="register" class="btn btn-primary">Create Account</button>
+        <label>Already have an account? </label>
+        <a href="#"><router-link to="/login">Sign in</router-link></a>
     </div>
+</div>
 </template>
 
 <script>
@@ -32,7 +34,6 @@ export default {
     name: "Registration", data() {
         return {
             email: "",
-            username: "",
             password: ""
         }
     },
@@ -45,12 +46,13 @@ export default {
                     const user = userCredential.user;
                     const functions = getFunctions(app);
                     const addUser = httpsCallable(functions, 'adduser');
-                    addUser({ "uid": user.uid, "username": this.username})
+                    addUser({ "uid": user.uid })
                         .then((result) => {
                             // Read result of the Cloud Function.
                             /** @type {any} */
+                            console.log(result);
                             console.log(user)
-                            this.$router.push({ path: '/' })
+                            this.$router.push({ path: '/Schedule' })
                         });
                     // ...
                 })
@@ -68,37 +70,64 @@ export default {
 </script>
 
 
+
+
+
 <style scoped>
-.registration-container {
-    max-width: 300px;
-    margin: 0 auto;
-    padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+.site-content {
     display: flex;
-    flex-direction: column;
-    justify-content: left;
+    justify-content: center;
     align-items: center;
     height: 50vh;
 }
 
+.registration-container {
+    max-width: 350px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 30px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background-color: #f9f9f9;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
 .form-group {
-    width: 100%; 
+    margin-bottom: 20px;
+}
+
+label {
+    font-weight: bold;
 }
 
 input {
-    width: 100%;
-    padding: 8px;
-    margin-bottom: 10px;
+    width: calc(100% - 16px);
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
 }
 
 button {
-    background-color: #4caf50;
+    width: 100%;
+    background-color: #4c53af;
     color: white;
-    padding: 10px;
+    padding: 12px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #4945a0;
+}
+
+button:active {
+    background-color: #3e3e8e;
+}
+
+button:focus {
+    outline: none;
 }
 
 </style>

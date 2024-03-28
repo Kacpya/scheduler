@@ -4,7 +4,7 @@
       <div class="week-navigation">
         <button class="button-17 " @click="toggleCalendar">
    
-    Calendar
+           Calendar
 </button>
 
     </div>

@@ -5,24 +5,24 @@
             <a href="#" target="_blank"><router-link to="/"><img src="https://thumbs2.imgbox.com/f7/4c/37VHMbz3_t.jpg" alt="image host"/></router-link></a>
         </div>
         <nav class="menu">
+            <div class="menu-content">
             <ul>
                 <li><a href="#"><router-link to="/">Home</router-link></a></li>
                 <li><a href="#"><router-link to="/about-us">About Us</router-link></a></li>
 
-                <li><a href="#"><router-link to="/login">My account</router-link></a>
+                <li v-if="loggedIn"><a href="#"><router-link to="/login">My account</router-link></a>
                     <ul>
-                        <li><a href="#"><router-link to="/myTable">My Timetable</router-link></a></li>
+                        <li><a href="#"><router-link to="/schedule">My Schedulite</router-link></a></li>
                         <li><a href="#"><router-link to="/settings">Settings</router-link></a></li>
                         <li><a href="#"><router-link to="/logOut">Log out</router-link></a></li>
                     </ul>
                 </li>
-
+            
             </ul>
-            <ul class="right-menu">
+        </div>
+            <ul class="logout-menu">
                 <li v-if="!loggedIn"><a href="#" class="login-btn"><router-link to="/login">Log in</router-link></a></li>
                 <li v-if="!loggedIn"><a href="#"><router-link to="/register">Sign up</router-link></a></li>
-            </ul>
-            <ul class="logout-menu">
                 <li v-if="loggedIn"><a href="#" class="logout-btn" @click="logout">Log Out</a></li>
             </ul>
         </nav>
@@ -71,3 +71,4 @@ export default {
 
 
 </script>
+
